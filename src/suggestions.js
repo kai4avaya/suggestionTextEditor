@@ -4,12 +4,13 @@ import { MentionList } from "./MentionList";
 let begIndex;
 let indexEndQuery = 0;
 
-
-
-
-window.addEventListener("keydown", (event) => {
-  console.log("Global key press detected:", event.key);
-}, true); // Using capture phase
+window.addEventListener(
+  "keydown",
+  (event) => {
+    console.log("Global key press detected:", event.key);
+  },
+  true
+); // Using capture phase
 
 function navigateItems(key) {
   const items = document.querySelectorAll(".items .item");
@@ -34,13 +35,13 @@ function navigateItems(key) {
 }
 
 const famousNames = [
-  "Lea Thompson",
-  "Cyndi Lauper",
-  "Tom Cruise",
-  "Madonna",
-  "Jerry Hall",
-  "Joan Collins",
-  "Winona Ryder",
+  "Summarize",
+  "Quiz me",
+  "Explain this simply",
+  "Examples that are simple",
+  "Research Papers",
+  "Quest Creation",
+  "Outline a study plan",
   "Christina Applegate",
   "Alyssa Milano",
   "Molly Ringwald",
@@ -77,23 +78,19 @@ export default {
     let isSelecting = false; // Flag to indicate if a selection is being made
 
     const setupKeydownListener = () => {
-      console.log("SETUP KEYDOWN LISTENER");
       document.addEventListener("keydown", handleKeyDown);
     };
 
     const removeKeydownListener = (e) => {
-      console.log("REMOVE KEYDOWN LISTENER",);
       document.removeEventListener("keydown", handleKeyDown);
     };
 
     const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        popup[0].hide();
 
-      if (event.key === 'Escape') {
-        popup[0].hide()
-
-        return true
+        return true;
       }
-
 
       if (
         (event.key === "ArrowUp" || event.key === "ArrowDown") &&
@@ -108,12 +105,10 @@ export default {
       if (event.key === "Enter" && popup && popup[0].state.isVisible) {
         removeLastCharacter();
         const selectedItem = getCurrentSelectedItem();
-        console.log("selectedItem", selectedItem);
         if (selectedItem) {
-          console.log("ME press enter Wooo", selectItem);
           selectItem(selectedItem);
-          // deleteNextChar() 
-          deleteNextChar()
+          // deleteNextChar()
+          deleteNextChar();
           popup[0].hide();
           event.preventDefault(); // Prevent default Enter key behavior, i.e., prevent adding a new line
           event.stopPropagation(); // Stop the event from bubbling up which prevents any other global handlers
@@ -127,14 +122,7 @@ export default {
         popup &&
         popup[0].state.isVisible
       ) {
-
-        console.log("got me a lil key", event.key);
-        // const position = editor.state.selection.$from.pos;
-        // const textFromStartToCaret = editor.state.doc.textBetween(
-        //   0,
-        //   position,
-        //   "\n"
-        // );
+   
         const position = editor.state.selection.$from.pos;
 
         const textFromStartToCaret = editor.state.doc.textBetween(
@@ -143,31 +131,23 @@ export default {
           "\n"
         );
 
+        const lastAtPos = getAtPos(); // textFromStartToCaret.lastIndexOf("@");
 
-        const lastAtPos = getAtPos() // textFromStartToCaret.lastIndexOf("@");
-
-        console.log("lastAtPos", lastAtPos);
 
         if (lastAtPos !== -1) {
-
-
           const query =
             textFromStartToCaret.substring(lastAtPos + 1) + event.key; // include current key stroke in query
-            indexEndQuery = query.length
+          indexEndQuery = query.length;
 
-          console.log(textFromStartToCaret.substring(lastAtPos + 1))
-          console.log("I AM QUERY", query)
+          console.log(textFromStartToCaret.substring(lastAtPos + 1));
           updateSuggestions(query);
-          // event.preventDefault(); // This prevents the character from being entered into the editor.
-          // event.stopPropagation(); // This stops the event from propagating further.
-          // deleteNextChar()
+ 
           return true; // Stop further processing of this key event
         }
       }
     };
 
-
-    function getAtPos(){
+    function getAtPos() {
       const position = editor.state.selection.$from.pos;
 
       const textFromStartToCaret = editor.state.doc.textBetween(
@@ -176,14 +156,13 @@ export default {
         "\n"
       );
 
-
-       return textFromStartToCaret.lastIndexOf("@");
+      return textFromStartToCaret.lastIndexOf("@");
     }
 
     function removeLastCharacter() {
       const { state, dispatch } = editor.view;
       const { $from } = state.selection;
-    
+
       // Ensure there is a character to remove
       if ($from.pos > 1) {
         // Create a transaction to delete the character right before the cursor
@@ -195,32 +174,22 @@ export default {
     function deleteNextChar() {
       const { state, dispatch } = editor.view;
       const { $from } = state.selection;
-    
+
       const nextCharPos = $from.pos;
 
-        console.log("nextCharPos", nextCharPos);
-      // if ($from.nodeAfter && $from.nodeAfter.textContent[nextCharPos - $from.start()] === '@') {
-        // Create a transaction to delete the '@' right after the cursor
-        let tr = state.tr.delete(nextCharPos, nextCharPos + 1);
-        dispatch(tr);
+      // Create a transaction to delete the '@' right after the cursor
+      let tr = state.tr.delete(nextCharPos, nextCharPos + 1);
+      dispatch(tr);
       // }
     }
-    
-    
+
     // Function to update the suggestions based on the input
     function updateSuggestions(inputChar) {
       // const currentQuery = document.querySelector('.query-input').textContent + inputChar;  // Adjust selector as necessary
       const itemsFiltered = items({ query: inputChar });
 
-      console.log("inputChar", inputChar)
-      console.log("i am getting query itemsFiltered", itemsFiltered)
-
-
-      
-
       const mentionListElement = MentionList(itemsFiltered, selectItem, editor);
 
-      console.log("mentionListElement", mentionListElement)
       if (popup) {
         popup[0].setContent(mentionListElement);
       } else {
@@ -243,16 +212,10 @@ export default {
     }
 
     function selectItem(item) {
-      // indexEndQuery
       const index = famousNames.findIndex((name) => name === item);
       if (index !== -1) {
         const mentionItem = famousNames[index]; // Assume you need the full object or formatted text
-        // const range = editor.state.selection.$from.pos - 1;
-        // const lastAtPos = getAtPos()+1
-        console.log("indexEndQuery", indexEndQuery)
-        const range = { from: begIndex-1, to: begIndex-1 + indexEndQuery};
-        // console.log("i am range", range)
-        console.log("i am last at position", range)
+        const range = { from: begIndex - 1, to: begIndex - 1 + indexEndQuery };
         editor.commands.insertContentAt(
           range,
           `<span data-type="mention" data-id="${mentionItem}">${mentionItem}</span>`,
@@ -262,31 +225,14 @@ export default {
         );
       }
     }
-// function selectItem(item) {
-//     const index = famousNames.findIndex((name) => name === item);
-//     if (index !== -1) {
-//         const mentionItem = famousNames[index];
-//         const lastAtPos = getAtPos();
-//         const mentionHTML = `<span data-type="mention" data-id="${mentionItem}">${mentionItem}</span>`;
-        
-//         // Replace the text between lastAtPos and indexEndQuery with the mention HTML
-//         const { tr } = editor.state;
-//         const transaction = tr.replaceWith(lastAtPos, indexEndQuery, editor.schema.text(mentionHTML));
-//         editor.view.dispatch(transaction);
-//     }
-// }
-
-  
 
     return {
       onStart: (props) => {
-
         indexEndQuery = 0;
 
-        console.log("I AM STARTING!", props)
         editor = props.editor;
 
-         begIndex = editor.state.selection.$from.pos;
+        begIndex = editor.state.selection.$from.pos;
 
         if (!props.clientRect) {
           return;
@@ -320,14 +266,8 @@ export default {
           editor
         );
 
-        //  if (popup) {
 
-        //   console.log("START alreadypopup", popup[0])
-        // popup[0].setContent(mentionListElement);
-        //  }
-        //  else{
-
-          console.log("A hole new popup", popup)
+        console.log("A hole new popup", popup);
         popup = tippy("body", {
           getReferenceClientRect: props.clientRect,
           appendTo: () => document.body,
@@ -345,10 +285,8 @@ export default {
           },
           onHidden: () => {
             removeKeydownListener(); // Ensure keydown listener is removed when truly hidden
-          }
+          },
         });
-      // }
-
       },
 
       onUpdate: (props) => {
@@ -370,7 +308,6 @@ export default {
       //     }
       //   }, 500); // Delay in milliseconds, adjust as needed
       // },
-      
     };
   },
 };
