@@ -9,22 +9,28 @@
   
   /* Basic editor styles */
 .tiptap > * + * {
-    margin-top: 0.75em;
+    /* margin-top: 0.75em; */
+    padding: 4px
+  }
+
+  .tiptap{
+    padding: 4px;
+  margin-top: -12px;
   }
   
   .tiptap:focus {
     outline: none !important;
 }
 
-  .tiptap h1, .tiptap h2, .tiptap h3, .tiptap h4, .tiptap h5, .tiptap h6 {
+  /* .tiptap h1, .tiptap h2, .tiptap h3, .tiptap h4, .tiptap h5, .tiptap h6 {
     line-height: 1.1;
-  }
+  } */
   
   #editor {
     padding: 2px;
     border: 1px solid black;
     border-radius: 5px;
-    height: 200px;
+    height: 50px;
     overflow: auto;
 }
   .mention {
@@ -67,6 +73,33 @@
     border-color: #000;
   }
   
+  #editor.is-empty:after {
+  content: 'Type something here...';
+  color: #adb5bd;
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 10px;
+  pointer-events: none;
+}
+
+
+.autocomplete-suggestion {
+    color: rgba(150, 150, 150, 0.5); /* Light gray color with transparency */
+    pointer-events: none; /* Ensures the text doesn't interfere with editing */
+    background-color: rgba(255, 255, 255, 0.1); /* Very subtle background */
+    border-bottom: 1px dashed rgba(130, 130, 130, 0.5); /* Dashed underline */
+}
+
+.tiptap p.is-editor-empty:first-child::before {
+  color: #adb5bd;
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+
 </style>
 <body>
   <div id="editor"></div>
