@@ -8,14 +8,14 @@
 <style>
   
   /* Basic editor styles */
-.tiptap > * + * {
-    /* margin-top: 0.75em; */
+/* .tiptap > * + * {
     padding: 4px
-  }
+  } */
 
   .tiptap{
-    padding: 4px;
+    padding: 2px;
   margin-top: -12px;
+  margin-bottom: -12px;
   }
   
   .tiptap:focus {
@@ -27,11 +27,12 @@
   } */
   
   #editor {
-    padding: 2px;
+    /* padding: 2px; */
     border: 1px solid black;
     border-radius: 5px;
     height: 50px;
     overflow: auto;
+    position: relative;
 }
   .mention {
     border: 1px solid #000;
@@ -79,7 +80,7 @@
   position: absolute;
   top: 0;
   left: 0;
-  padding: 10px;
+  padding: 4px;
   pointer-events: none;
 }
 
@@ -99,11 +100,46 @@
   pointer-events: none;
 }
 
+.w-6 {
+  width: 1.5rem;
+}
+.h-6
+{
+  height: 1.5rem;
+}
+
+#enter-btn {
+  position: absolute;
+  bottom: 2px;
+  right: 6px;
+  z-index: 10;
+
+}
+
+.icon-rotate{
+  display: inline-block; 
+  transform: rotate(-45deg); 
+}
+
+.icon-color {
+  stroke: blue; /* Set the default color to blue */
+  transition: stroke 0.3s ease; /* Smooth transition for the stroke color change */
+}
+
+.icon-color:hover {
+  stroke: rgb(8, 239, 8); /* Change color on hover to dark blue */
+  cursor: pointer; /* Change cursor to indicate a clickable button */
+}
 
 </style>
 <body>
-  <div id="editor"></div>
-  <div id="character-count"></div>
+  <div id="editor">
+    <div id="enter-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="0.75" stroke="currentColor" class="icon-rotate icon-color w-6 h-6">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
+      </svg>
+  </div>
+  </div>
   <script src="dist/bundle.js"></script>
 </body>
 </html>

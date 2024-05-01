@@ -1,6 +1,11 @@
 import tippy from "tippy.js";
 import { MentionList } from "./MentionList";
-let editor;
+// let editor;
+let begIndex;
+let indexEndQuery = 0;
+
+
+
 
 window.addEventListener("keydown", (event) => {
   console.log("Global key press detected:", event.key);
@@ -83,12 +88,12 @@ export default {
 
     const handleKeyDown = (event) => {
 
-      // if (event.key === "Escape" && popup) {
-      //   popup[0].hide();
-      //   return true;
-      // }
+      if (event.key === 'Escape') {
+        popup[0].hide()
 
-      console.log("popup[0].state.isVisible", popup[0].state.isVisible);
+        return true
+      }
+
 
       if (
         (event.key === "ArrowUp" || event.key === "ArrowDown") &&
@@ -107,10 +112,11 @@ export default {
         if (selectedItem) {
           console.log("ME press enter Wooo", selectItem);
           selectItem(selectedItem);
+          // deleteNextChar() 
+          deleteNextChar()
           popup[0].hide();
           event.preventDefault(); // Prevent default Enter key behavior, i.e., prevent adding a new line
           event.stopPropagation(); // Stop the event from bubbling up which prevents any other global handlers
-          deleteAtIfNext() 
           return true;
         }
       }
@@ -121,31 +127,58 @@ export default {
         popup &&
         popup[0].state.isVisible
       ) {
+
+        console.log("got me a lil key", event.key);
+        // const position = editor.state.selection.$from.pos;
+        // const textFromStartToCaret = editor.state.doc.textBetween(
+        //   0,
+        //   position,
+        //   "\n"
+        // );
         const position = editor.state.selection.$from.pos;
+
         const textFromStartToCaret = editor.state.doc.textBetween(
           0,
           position,
           "\n"
         );
-        const lastAtPos = textFromStartToCaret.lastIndexOf("@");
+
+
+        const lastAtPos = getAtPos() // textFromStartToCaret.lastIndexOf("@");
+
+        console.log("lastAtPos", lastAtPos);
 
         if (lastAtPos !== -1) {
+
+
           const query =
             textFromStartToCaret.substring(lastAtPos + 1) + event.key; // include current key stroke in query
+            indexEndQuery = query.length
+
+          console.log(textFromStartToCaret.substring(lastAtPos + 1))
+          console.log("I AM QUERY", query)
           updateSuggestions(query);
-          event.preventDefault(); // This prevents the character from being entered into the editor.
-          event.stopPropagation(); // This stops the event from propagating further.
+          // event.preventDefault(); // This prevents the character from being entered into the editor.
+          // event.stopPropagation(); // This stops the event from propagating further.
+          // deleteNextChar()
           return true; // Stop further processing of this key event
         }
       }
     };
 
 
+    function getAtPos(){
+      const position = editor.state.selection.$from.pos;
 
-    function getCurrentSelectedItem() {
-      return document.querySelector(".items .is-selected")?.textContent;
+      const textFromStartToCaret = editor.state.doc.textBetween(
+        0,
+        position,
+        "\n"
+      );
+
+
+       return textFromStartToCaret.lastIndexOf("@");
     }
-
 
     function removeLastCharacter() {
       const { state, dispatch } = editor.view;
@@ -159,15 +192,14 @@ export default {
       }
     }
 
-    function deleteAtIfNext() {
+    function deleteNextChar() {
       const { state, dispatch } = editor.view;
       const { $from } = state.selection;
     
-      console.log("i am AT")
-      // Check if there is a character in front of the cursor and if it's '@'
       const nextCharPos = $from.pos;
+
+        console.log("nextCharPos", nextCharPos);
       // if ($from.nodeAfter && $from.nodeAfter.textContent[nextCharPos - $from.start()] === '@') {
-        console.log("bye bye AT")
         // Create a transaction to delete the '@' right after the cursor
         let tr = state.tr.delete(nextCharPos, nextCharPos + 1);
         dispatch(tr);
@@ -177,15 +209,18 @@ export default {
     
     // Function to update the suggestions based on the input
     function updateSuggestions(inputChar) {
-      // Update the current query with the new character
-
-      console.log("inputChar", inputChar);
       // const currentQuery = document.querySelector('.query-input').textContent + inputChar;  // Adjust selector as necessary
       const itemsFiltered = items({ query: inputChar });
 
-      console.log("itemsFiltered", itemsFiltered);
+      console.log("inputChar", inputChar)
+      console.log("i am getting query itemsFiltered", itemsFiltered)
 
-      const mentionListElement = MentionList(itemsFiltered, selectItem);
+
+      
+
+      const mentionListElement = MentionList(itemsFiltered, selectItem, editor);
+
+      console.log("mentionListElement", mentionListElement)
       if (popup) {
         popup[0].setContent(mentionListElement);
       } else {
@@ -198,7 +233,7 @@ export default {
           trigger: "manual",
           placement: "top-start",
           onShow: setupKeydownListener,
-          // onHide: removeKeydownListener,
+          onHide: removeKeydownListener,
         });
       }
     }
@@ -208,10 +243,16 @@ export default {
     }
 
     function selectItem(item) {
+      // indexEndQuery
       const index = famousNames.findIndex((name) => name === item);
       if (index !== -1) {
         const mentionItem = famousNames[index]; // Assume you need the full object or formatted text
-        const range = editor.state.selection.$from.pos - 1;
+        // const range = editor.state.selection.$from.pos - 1;
+        // const lastAtPos = getAtPos()+1
+        console.log("indexEndQuery", indexEndQuery)
+        const range = { from: begIndex-1, to: begIndex-1 + indexEndQuery};
+        // console.log("i am range", range)
+        console.log("i am last at position", range)
         editor.commands.insertContentAt(
           range,
           `<span data-type="mention" data-id="${mentionItem}">${mentionItem}</span>`,
@@ -221,10 +262,31 @@ export default {
         );
       }
     }
+// function selectItem(item) {
+//     const index = famousNames.findIndex((name) => name === item);
+//     if (index !== -1) {
+//         const mentionItem = famousNames[index];
+//         const lastAtPos = getAtPos();
+//         const mentionHTML = `<span data-type="mention" data-id="${mentionItem}">${mentionItem}</span>`;
+        
+//         // Replace the text between lastAtPos and indexEndQuery with the mention HTML
+//         const { tr } = editor.state;
+//         const transaction = tr.replaceWith(lastAtPos, indexEndQuery, editor.schema.text(mentionHTML));
+//         editor.view.dispatch(transaction);
+//     }
+// }
+
+  
 
     return {
       onStart: (props) => {
+
+        indexEndQuery = 0;
+
+        console.log("I AM STARTING!", props)
         editor = props.editor;
+
+         begIndex = editor.state.selection.$from.pos;
 
         if (!props.clientRect) {
           return;
@@ -254,9 +316,18 @@ export default {
                 replace: 1,
               }
             );
-          }
+          },
+          editor
         );
 
+        //  if (popup) {
+
+        //   console.log("START alreadypopup", popup[0])
+        // popup[0].setContent(mentionListElement);
+        //  }
+        //  else{
+
+          console.log("A hole new popup", popup)
         popup = tippy("body", {
           getReferenceClientRect: props.clientRect,
           appendTo: () => document.body,
@@ -276,6 +347,8 @@ export default {
             removeKeydownListener(); // Ensure keydown listener is removed when truly hidden
           }
         });
+      // }
+
       },
 
       onUpdate: (props) => {

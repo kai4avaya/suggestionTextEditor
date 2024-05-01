@@ -1,4 +1,4 @@
-export function MentionList(items, command) {
+export function MentionList(items, command, editorView) {
     let selectedIndex = 0;
 
     const mentionListElement = document.createElement('div');
@@ -11,7 +11,16 @@ export function MentionList(items, command) {
                 const button = document.createElement('button');
                 button.className = `item ${index === selectedIndex ? 'is-selected' : ''}`;
                 button.textContent = item;
-                button.addEventListener('click', () => selectItem(index));
+                // button.addEventListener('click', () => selectItem(index));
+                button.addEventListener('click', () => {
+                    selectItem(index)
+                    // command({ id: items[index] });
+                    // Focus the editor
+                    console.log("i am editorView", editorView)
+                    
+                    editorView.view.focus();
+                });
+                
                 mentionListElement.appendChild(button);
             });
         } else {

@@ -269,15 +269,7 @@ export const AutocompleteExtension = Extension.create({
 
 
                         if (textContent) {
-                            // const textBefore = selection.$head.parent.textBetween(0, selection.$head.parentOffset, null, '\ufffc');
-                            // const startPos = cursorPos - textBefore.length;
-                            // const endPos = startPos + textContent.length;
-           
-
-                            // let startPos = cursorPos
-
-                            // console.log("startPos",startPos)
-                            // console.log("endPos", endPos)
+                      
 
                             const nextNode = transaction.doc.nodeAt(cursorPos)
                             if (!nextNode || nextNode.isBlock) {
