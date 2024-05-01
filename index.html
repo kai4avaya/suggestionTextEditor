@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Plain Text Editor</title>
+</head>
+<style>
+  
+  /* Basic editor styles */
+.tiptap > * + * {
+    margin-top: 0.75em;
+  }
+  
+  .tiptap:focus {
+    outline: none !important;
+}
+
+  .tiptap h1, .tiptap h2, .tiptap h3, .tiptap h4, .tiptap h5, .tiptap h6 {
+    line-height: 1.1;
+  }
+  
+  #editor {
+    padding: 2px;
+    border: 1px solid black;
+    border-radius: 5px;
+    height: 200px;
+    overflow: auto;
+}
+  .mention {
+    border: 1px solid #000;
+    border-radius: 0.4rem;
+    padding: 0.1rem 0.3rem;
+    box-decoration-break: clone;
+  }
+  
+
+  .items {
+    padding: 0.2rem;
+    position: relative;
+    border-radius: 0.5rem;
+    background: #FFF;
+    color: rgba(0, 0, 0, 0.8);
+    overflow: hidden;
+    font-size: 0.9rem;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05), 0px 10px 20px rgba(0, 0, 0, 0.1);
+  }
+  
+  .item {
+    display: block;
+    margin: 0;
+    width: 100%;
+    text-align: left;
+    background: transparent;
+    border-radius: 0.4rem;
+    border: 1px solid transparent;
+    padding: 0.2rem 0.4rem;
+  }
+  
+
+  .item:hover {
+    background-color: lightgray; /* Change background color when hovered */
+}
+
+
+  .item.is-selected {
+    border-color: #000;
+  }
+  
+</style>
+<body>
+  <div id="editor"></div>
+  <div id="character-count"></div>
+  <script src="dist/bundle.js"></script>
+</body>
+</html>
