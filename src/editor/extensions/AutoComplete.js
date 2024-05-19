@@ -206,23 +206,17 @@ export const AutocompleteExtension = Extension.create({
         //     }
         // }
         function decideAutocompleteText(selection) {
-            console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
             const { $cursor } = selection;
             if (!$cursor) return null;  // No cursor, no suggestions needed.
         
             const extensionOptions = extension.options;
         
-            console.log("cursor", $cursor);
-            console.log("extensionOptions", extensionOptions);
-        
             const { textBuffer, bufferLength, bufferTimer } = extensionOptions;
             
             const textBefore = $cursor.parent.textBetween(0, $cursor.parentOffset, null, '\ufffc');
-            console.log("textBefore", textBefore);
         
             // Determine what the new buffer should be
             let newTextBuffer = textBefore.slice(-bufferLength); // Get the last 'bufferLength' characters
-            console.log("newTextBuffer", newTextBuffer);
         
             // Check if the buffer needs updating (if the text has changed)
             if (newTextBuffer !== textBuffer) {
@@ -231,7 +225,6 @@ export const AutocompleteExtension = Extension.create({
                 clearTimeout(bufferTimer);
                 extensionOptions.bufferTimer = setTimeout(() => {
                     extensionOptions.textBuffer = ""; // Clear buffer after inactivity
-                    console.log("Buffer cleared due to inactivity");
                 }, 1000); // Resets after 1 second of inactivity
             }
         
@@ -278,12 +271,11 @@ export const AutocompleteExtension = Extension.create({
                                             const parentNode = document.createElement('span')
                                             remainingText = textContent.slice(extension.options.textBuffer.length);
 
-                                            console.log("i am remainingText", remainingText)
                                             // let textContent = decideAutocompleteText(selection, this.options.delayBeforeShow)
                                             // Create a span for the suggestion
                                             // const c = `<span class="">${remainingText}</span>`
                                             const c = `<span class="">${remainingText} <div style="display: inline-block; margin-left: 10px; padding: 2px 8px; font-size: 10px; border: 1px solid #ccc; border-radius: 3px; cursor: pointer;">Tab</div></span>`
-// textContent = remainingText.replace(/\[(.*?)\]/g, c);
+
                                             parentNode.innerHTML = c
                                             parentNode.classList.add(this.options.className)
             

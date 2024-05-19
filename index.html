@@ -1,46 +1,68 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Plain Text Editor</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@^2.2.19/dist/tailwind.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+
 </head>
 <style>
-  
   /* Basic editor styles */
-/* .tiptap > * + * {
+  /* .tiptap > * + * {
     padding: 4px
   } */
 
-  .tiptap{
+  .tiptap {
     padding: 2px;
-  margin-top: -12px;
-  margin-bottom: -12px;
+    margin-top: -12px;
+    margin-bottom: -12px;
   }
-  
+
   .tiptap:focus {
     outline: none !important;
-}
+  }
 
   /* .tiptap h1, .tiptap h2, .tiptap h3, .tiptap h4, .tiptap h5, .tiptap h6 {
     line-height: 1.1;
   } */
-  
+
   #editor {
-    /* padding: 2px; */
-    border: 1px solid black;
-    border-radius: 5px;
-    height: 50px;
-    overflow: auto;
+    overflow: hidden;
+    /* Hides scrollbars */
     position: relative;
-}
+
+    padding: 10px;
+    
+  }
+
+  
+  .tiptap-editor-content {
+    min-height: 150px;
+    /* Minimum height */
+    resize: vertical;
+    /* Allows manual resizing */
+    overflow: hidden;
+    resize: none;
+
+
+
+  }
+
   .mention {
     border: 1px solid #000;
     border-radius: 0.4rem;
     padding: 0.1rem 0.3rem;
     box-decoration-break: clone;
   }
-  
+
+  /* .tiptap-editor-content {
+  padding: 10px;
+  overflow: auto;
+} */
+
 
   .items {
     padding: 0.2rem;
@@ -52,7 +74,7 @@
     font-size: 0.9rem;
     box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05), 0px 10px 20px rgba(0, 0, 0, 0.1);
   }
-  
+
   .item {
     display: block;
     margin: 0;
@@ -63,82 +85,213 @@
     border: 1px solid transparent;
     padding: 0.2rem 0.4rem;
   }
-  
+
 
   .item:hover {
-    background-color: lightgray; /* Change background color when hovered */
-}
+    background-color: lightgray;
+    /* Change background color when hovered */
+  }
 
 
   .item.is-selected {
     border-color: #000;
   }
-  
+
   #editor.is-empty:after {
-  content: 'Type something here...';
-  color: #adb5bd;
+    content: 'Type something here...';
+    color: #adb5bd;
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 4px;
+    pointer-events: none;
+  }
+
+
+  .autocomplete-suggestion {
+    color: rgba(150, 150, 150, 0.5);
+    /* Light gray color with transparency */
+    pointer-events: none;
+    /* Ensures the text doesn't interfere with editing */
+    background-color: rgba(255, 255, 255, 0.1);
+    /* Very subtle background */
+  }
+
+  .tiptap p.is-editor-empty:first-child::before {
+    color: #adb5bd;
+    content: attr(data-placeholder);
+    float: left;
+    height: 0;
+    pointer-events: none;
+  }
+
+  .w-6 {
+    width: 1.5rem;
+  }
+
+  .h-6 {
+    height: 1.5rem;
+  }
+
+
+
+  .icon {
+    width: 24px;
+    /* Ensuring consistent icon size */
+    height: 24px;
+  }
+
+  .editor-container {
+    display: flex;
+    flex-direction: column;
+    /* Stack menu bar and editor vertically */
+  }
+
+
+
+  .text-area {
+    outline: none;
+  } 
+
+
+  /* node view */ 
+  
+.node-view {
+  background: #FAF594;
+  border: 3px solid #0D0D0D;
+  border-radius: 0.5rem;
+  margin: 1rem 0;
+  position: relative;
+}
+
+.label {
+  margin-left: 1rem;
+  background-color: #0D0D0D;
+  font-size: 0.6rem;
+  letter-spacing: 1px;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: #fff;
   position: absolute;
   top: 0;
-  left: 0;
-  padding: 4px;
-  pointer-events: none;
+  padding: 0.25rem 0.75rem;
+  border-radius: 0 0 0.5rem 0.5rem;
 }
 
-
-.autocomplete-suggestion {
-    color: rgba(150, 150, 150, 0.5); /* Light gray color with transparency */
-    pointer-events: none; /* Ensures the text doesn't interfere with editing */
-    background-color: rgba(255, 255, 255, 0.1); /* Very subtle background */
+.editor-container {
+  max-width: 600px;
+}
+.highlight {
+  background-color: lightgray;
 }
 
-.tiptap p.is-editor-empty:first-child::before {
-  color: #adb5bd;
-  content: attr(data-placeholder);
-  float: left;
-  height: 0;
-  pointer-events: none;
-}
-
-.w-6 {
-  width: 1.5rem;
-}
-.h-6
-{
-  height: 1.5rem;
-}
-
-#enter-btn {
+.annotation {
+  background-color: white;
+  border: 1px solid black;
+  border-radius: 5px;
+  padding: 5px;
   position: absolute;
-  bottom: 2px;
-  right: 6px;
   z-index: 10;
-
+  /* right: 0; */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100px; /* Fixed width to ensure it's square */
+  height: 100px; /* Fixed height to ensure it's square */
+  overflow: hidden;
 }
 
-.icon-rotate{
-  display: inline-block; 
-  transform: rotate(-45deg); 
+/* ANNOTATOR */
+.container {
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+  padding: 24px;
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  font-family: monospace;
 }
 
-.icon-color {
-  stroke: blue; /* Set the default color to blue */
-  transition: stroke 0.3s ease; /* Smooth transition for the stroke color change */
+.container.dark {
+  background-color: #1c1c1e;
 }
 
-.icon-color:hover {
-  stroke: rgb(8, 239, 8); /* Change color on hover to dark blue */
-  cursor: pointer; /* Change cursor to indicate a clickable button */
+#leftPanel {
+  flex: 1 3;
+  padding: 16px;
 }
+
+#leftPanel h2 {
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin-bottom: 16px;
+  color: #18181b;
+}
+
+.container.dark #leftPanel h2 {
+  color: white;
+}
+
+#leftPanel p {
+  margin-bottom: 16px;
+  color: #18181b;
+}
+
+.container.dark #leftPanel p {
+  color: #d1d5db;
+}
+
+#rightPanel {
+  flex: 1 2;
+  padding: 16px;
+}
+
+#rightPanel ul {
+  list-style-type: disc;
+  margin-left: 1.25rem;
+}
+
+#rightPanel ul li {
+  margin-bottom: 8px;
+  color: #4b5563;
+}
+
+.container.dark #rightPanel ul li {
+  color: #9ca3af;
+}
+
 
 </style>
+
 <body>
-  <div id="editor">
-    <div id="enter-btn">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="0.75" stroke="currentColor" class="icon-rotate icon-color w-6 h-6">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
-      </svg>
+
+  <div class="editor-container m-auto editor rounded-lg border border-zinc-300 bg-white">
+    <div class="toolbar flex items-center border-b border-zinc-300 p-2">
+      <select class="format-dropdown mr-2 rounded border bg-white p-1">
+        <option>Normal</option>
+        <option>Heading 1</option>
+        <option>Heading 2</option>
+        <option>Heading 3</option>
+      </select>
+      <button class="tool-button mx-1" onclick="execCmd('bold')"><b>B</b></button>
+      <button class="tool-button mx-1" onclick="execCmd('italic')"><i>I</i></button>
+      <button class="tool-button mx-1" onclick="execCmd('underline')"><u>U</u></button>
+      <button class="tool-button mx-1" onclick="execCmd('insertUnorderedList')">&#8226;</button>
+      <button class="tool-button mx-1" onclick="execCmd('insertOrderedList')">&#35;</button>
+      <button class="tool-button mx-1" onclick="execCmd('insertParagraph')">&lt;p&gt;</button>
+    </div>
+    <!-- <div id="textArea" contenteditable="true" class="text-area h-40 p-3"></div> -->
+    <div id="editor">
+    </div>
   </div>
-  </div>
+
+
   <script src="dist/bundle.js"></script>
 </body>
+<script>
+  function execCmd(command) {
+    document.execCommand(command, false, null);
+  }
+</script>
+
 </html>

@@ -3,14 +3,12 @@ import { MentionList } from "./MentionList";
 // let editor;
 let begIndex;
 let indexEndQuery = 0;
+let dontClose = false; 
 
-window.addEventListener(
-  "keydown",
-  (event) => {
-    console.log("Global key press detected:", event.key);
-  },
-  true
-); // Using capture phase
+// function performEnterAction() {
+//   console.log("Enter key pressed and popup is closed. Function called!");
+//   // Add the actual function logic here
+// }
 
 function navigateItems(key) {
   const items = document.querySelectorAll(".items .item");
@@ -75,7 +73,6 @@ export default {
 
   render: (editor) => {
     let popup;
-    let isSelecting = false; // Flag to indicate if a selection is being made
 
     const setupKeydownListener = () => {
       document.addEventListener("keydown", handleKeyDown);
@@ -116,13 +113,30 @@ export default {
         }
       }
 
+      // if (event.key === ' ' && popup && popup[0].state.isVisible) {
+      //   console.log("Space key pressed, popup text:", popup[0].popper.firstElementChild.innerText);
+        
+      //   // Check if popup should be hidden based on its content
+      //   if(popup[0].popper.firstElementChild.innerText.includes("No Result")) {
+      //     console.log("No result found - hiding popup.");
+      //     popup[0].hide();
+      //   } else {
+      //     // event.preventDefault(); // Prevent any default spacebar actions (like button click)
+      //     // event.stopPropagation(); // Stop the event from propagating further
+      //   }
+      
+      //   return true; // Handle spacebar exclusively here when popup is visible
+      // }
+      
+
       // Process alphanumeric characters only if the popup is visible and the query matches suggestion criteria
       if (
         /^[a-z0-9\s]$/i.test(event.key) &&
         popup &&
         popup[0].state.isVisible
       ) {
-   
+        
+
         const position = editor.state.selection.$from.pos;
 
         const textFromStartToCaret = editor.state.doc.textBetween(
@@ -139,7 +153,6 @@ export default {
             textFromStartToCaret.substring(lastAtPos + 1) + event.key; // include current key stroke in query
           indexEndQuery = query.length;
 
-          console.log(textFromStartToCaret.substring(lastAtPos + 1));
           updateSuggestions(query);
  
           return true; // Stop further processing of this key event
@@ -185,13 +198,22 @@ export default {
 
     // Function to update the suggestions based on the input
     function updateSuggestions(inputChar) {
+
       // const currentQuery = document.querySelector('.query-input').textContent + inputChar;  // Adjust selector as necessary
       const itemsFiltered = items({ query: inputChar });
 
       const mentionListElement = MentionList(itemsFiltered, selectItem, editor);
 
       if (popup) {
+        try {
         popup[0].setContent(mentionListElement);
+        }
+        catch(e)
+        {
+          console.log(popup[0])
+          popup[0].hide()
+        }
+        console.log("WE GOT THAT old popup")
       } else {
         popup = tippy("body", {
           getReferenceClientRect: props.clientRect,
@@ -202,7 +224,13 @@ export default {
           trigger: "manual",
           placement: "top-start",
           onShow: setupKeydownListener,
-          onHide: removeKeydownListener,
+          onHide: (instance) => {
+          
+          },
+
+          onHidden: () => {
+            removeKeydownListener(); // Ensure keydown listener is removed when truly hidden
+          },
         });
       }
     }
@@ -234,6 +262,7 @@ export default {
 
         begIndex = editor.state.selection.$from.pos;
 
+        console.log("ME STARTING", props)
         if (!props.clientRect) {
           return;
         }
@@ -267,7 +296,6 @@ export default {
         );
 
 
-        console.log("A hole new popup", popup);
         popup = tippy("body", {
           getReferenceClientRect: props.clientRect,
           appendTo: () => document.body,
@@ -277,11 +305,7 @@ export default {
           trigger: "manual",
           placement: "top-start",
           onShow: setupKeydownListener,
-          onHide: () => {
-            if (isSelecting) {
-              isSelecting = false; // Reset the flag after handling
-              return false; // Prevent hiding if selection is ongoing
-            }
+          onHide: (instance) => {
           },
           onHidden: () => {
             removeKeydownListener(); // Ensure keydown listener is removed when truly hidden
@@ -299,15 +323,15 @@ export default {
         });
       },
 
-      // onExit: () => {
-      //   console.log("i have been destroyed  :(");
-      //   setTimeout(() => {
-      //     if (popup) {
-      //       popup[0].destroy();
-      //       document.removeEventListener("keydown", handleKeyDown);
-      //     }
-      //   }, 500); // Delay in milliseconds, adjust as needed
-      // },
+      onExit: () => {
+        console.log("i have been destroyed  :(");
+        setTimeout(() => {
+          if (popup) {
+            popup[0].destroy();
+            document.removeEventListener("keydown", handleKeyDown);
+          }
+        }, 500); // Delay in milliseconds, adjust as needed
+      },
     };
   },
 };
