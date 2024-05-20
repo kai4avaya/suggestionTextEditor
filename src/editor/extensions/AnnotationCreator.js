@@ -7,7 +7,7 @@ const AnnotationExtension = Node.create({
 
   group: 'block',
 
-  atom: true,
+  // atom: true,
 
   addOptions() {
     return {
@@ -64,17 +64,17 @@ const AnnotationExtension = Node.create({
             return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
           };
       // Function to wrap text parts with special code blocks
-      const wrapTextWithCodeBlocks = (text, annotations) => {
+      const wrapTextWithCodeBlocks = (text, annotations, dataArray) => {
 
 
-        console.log("annotations", annotations)
+        // console.log("annotations", annotations)
 
-        let dataArray;
-        try {
-          dataArray = JSON.parse(annotations);
-        } catch (error) {
-          console.error("Error parsing JSON string:", error);
-        }
+        // let dataArray = []
+        // try {
+        //   dataArray = JSON.parse(annotations);
+        // } catch (error) {
+        //   // console.error("Error parsing JSON string:", error);
+        // }
 
         
         dataArray.forEach(annotation => {
@@ -86,20 +86,26 @@ const AnnotationExtension = Node.create({
         return text;
       };
 
-      const p = document.createElement('p');
-      p.className = 'mb-4 text-gray-900 dark:text-gray-300';
-      p.innerHTML = wrapTextWithCodeBlocks(node.attrs.text, node.attrs.annotations);
+      
+      // const p = document.createElement('p');
+      // p.className = 'mb-4 text-gray-900 dark:text-gray-300';
+      // p.innerHTML = wrapTextWithCodeBlocks(node.attrs.text, node.attrs.annotations);
 
       const ul = document.createElement('ul');
       ul.className = 'list-disc space-y-2 text-gray-600 dark:text-gray-400';
 
-      let dataArray;
+      let dataArray = [];
       try {
         dataArray = JSON.parse(node.attrs.annotations);
       } catch (error) {
-        console.error("Error parsing JSON string:", error);
-        dataArray = [];
+        // console.error("Error parsing JSON string:", error);
+        return;
       }
+
+      const p = document.createElement('p');
+      p.className = 'mb-4 text-gray-900 dark:text-gray-300';
+      p.innerHTML = wrapTextWithCodeBlocks(node.attrs.text, node.attrs.annotations, dataArray);
+
 
       dataArray.forEach((annotation, index) => {
         const li = document.createElement('li');
@@ -115,6 +121,11 @@ const AnnotationExtension = Node.create({
       dom.appendChild(leftPanel);
       dom.appendChild(rightPanel);
 
+      // Ensure text selection is possible
+      dom.addEventListener('mousedown', (event) => {
+        event.preventDefault();
+      });
+
       // Add hover event listeners
       const codeBlocks = p.querySelectorAll('code');
       codeBlocks.forEach((codeBlock, index) => {
@@ -128,10 +139,12 @@ const AnnotationExtension = Node.create({
 
       ul.querySelectorAll('li').forEach((li, index) => {
         li.addEventListener('mouseenter', () => {
-          codeBlocks[index].classList.add('bg-yellow-200');
+          if(codeBlocks[index])
+            codeBlocks[index].classList.add('bg-yellow-200');
         });
         li.addEventListener('mouseleave', () => {
-          codeBlocks[index].classList.remove('bg-yellow-200');
+          if(codeBlocks[index])
+            codeBlocks[index].classList.remove('bg-yellow-200');
         });
       });
 
@@ -171,9 +184,11 @@ const AnnotationExtension = Node.create({
 
             ul.querySelectorAll('li').forEach((li, index) => {
               li.addEventListener('mouseenter', () => {
+                if(codeBlocks[index])
                 codeBlocks[index].classList.add('bg-yellow-200');
               });
               li.addEventListener('mouseleave', () => {
+                if(codeBlocks[index])
                 codeBlocks[index].classList.remove('bg-yellow-200');
               });
             });
