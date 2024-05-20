@@ -97,10 +97,15 @@ export default Node.create({
         // let annotationNode = ''
 
         for await (const chunk of jsonAgent(messageText,queryText)) {
-          const annotationNode = new TextDecoder("utf-8").decode(chunk);
+          let annotationNode = new TextDecoder("utf-8").decode(chunk);
           try{
           // let jsonObj = JSON.parse(text);
           annotationNode = annotationSerializer(annotationNode, messageText, queryText)
+
+          console.log("annotationNode", annotationNode)
+
+        editor.commands.insertContent(annotationNode);
+
 
           }catch(error){
             console.error("Error parsing JSON string:", error);
@@ -120,7 +125,7 @@ export default Node.create({
 
 
         // Insert the content into the editor
-        editor.commands.insertContent(content);
+        // editor.commands.insertContent(content);
 
         // Clear the form
         input.value = '';

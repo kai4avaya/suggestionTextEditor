@@ -1,7 +1,7 @@
 const BASEURL = `https://letmeeatkaik.azurewebsites.net/`
 const TESTURL = `http://localhost:3000/`
 
-const jsonUrl = `${BASEURL}api/lang-groq`;
+const jsonUrl = `${TESTURL}api/lang-groq`;
 
 import { jsonAgentPrompt } from "../../confgs/envConfigs";
 
