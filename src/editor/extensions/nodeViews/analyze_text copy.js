@@ -86,82 +86,51 @@ export default Node.create({
       form.addEventListener('mouseup', handleFormEvent);
       form.addEventListener('click', handleFormEvent);
 
-      let previousNodePosition = null;
+      let previousNodeRange = null;
+  // Handle form submission
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
 
-      // Handle form submission
-      form.addEventListener('submit', async (event) => {
-        event.preventDefault();
+    // Extract text from input and textarea
+    const queryText = input.value;
+    const messageText = textarea.value;
 
-        // Extract text from input and textarea
-        const queryText = input.value;
-        const messageText = textarea.value;
+    // Calculate the position right after the formNode
+    const formNodePosition = getPos() + node.nodeSize;
 
-        // Calculate the position right after the formNode
-        const formNodePosition = getPos() + node.nodeSize;
+    for await (const chunk of jsonAgent(messageText, queryText)) {
+      let annotationNode = new TextDecoder("utf-8").decode(chunk);
+      try {
+        annotationNode = annotationSerializer(annotationNode, messageText, queryText);
 
-        let count = 0;
+        // Remove the previously inserted node if it exists
+        if (previousNodeRange) {
 
-        for await (const chunk of jsonAgent(messageText, queryText)) {
-          let annotationNode = new TextDecoder("utf-8").decode(chunk);
-          // try {
-          
-           
-
-            if (count === 0){
-              annotationNode = annotationSerializer(annotationNode, messageText, queryText);
-            }
-
-//             const regex = /annotations='([^']*)'/;
-// const match = str.match(regex);
-// const annotations = match ? match[1] : null;
-
-            if (previousNodePosition !== null) {
-
-              try{
-                JSON.parse(annotationNode);
-
-             
-             
-
-              // console.log("annotationNode", annotationNode)
-
-              // Update the previously inserted node's attributes
-              editor.commands.updateAttributes('annotationCreator', {
-                text: messageText,// annotationNode.content[0].text,
-
-                annotations: annotationNode //annotationNode.attrs.annotations,
-              });
-            }  catch(e){
-              // return true;
-              console.log("error JSON PARSE", e)
-            
-            }
-
-            } else {
-              // Set the selection to the position right after the formNode
-              editor.chain().setTextSelection(formNodePosition).focus().run();
-
-              // Insert the content at the current cursor position
-              editor.commands.insertContent(annotationNode);
-
-              // Update the previous node position
-              const { from } = editor.state.selection;
-              previousNodePosition = from;
-            }
-          // } catch (error) {
-          //   console.error("Error parsing JSON string:", error);
-          // }
-          count+=1
+          console.log("previousNodeRange", previousNodeRange)
+          console.log("formNodePosition", formNodePosition)
+          editor.chain().deleteRange(previousNodeRange).run();
         }
+
+        // Set the selection to the position right after the formNode
+        editor.chain().setTextSelection(formNodePosition).focus().run();
+
+        // Insert the content at the current cursor position
+        editor.commands.insertContent(annotationNode);
+
+        // Update the previous node range
+        const { from, to } = editor.state.selection;
+        previousNodeRange = { from, to };
+
+      } catch (error) {
+        console.error("Error parsing JSON string:", error);
+      }
+    }
+
+    // Clear the form
+    input.value = '';
+    textarea.value = '';
+  });
     
-
-
-        // Clear the form
-        input.value = '';
-        textarea.value = '';
-      });
-
-
       return {
         dom,
         ignoreMutation: () => true,

@@ -7,6 +7,8 @@ const AnnotationExtension = Node.create({
 
   group: 'block',
 
+  // atom: true,
+
   addOptions() {
     return {
       annotations: [],
@@ -15,9 +17,9 @@ const AnnotationExtension = Node.create({
 
   addAttributes() {
     return {
-      title: {
-        default: 'Annotations',
-      },
+        title: {
+            default: 'Annotations',
+          },
       text: {
         default: '',
       },
@@ -56,40 +58,40 @@ const AnnotationExtension = Node.create({
       h2.className = 'text-xl font-bold mb-4 tracking-tighter text-gray-900 dark:text-white';
       h2.textContent = node.attrs.title;
 
-      // Function to escape special characters in a string for use in a regex
-      const escapeRegExp = (string) => {
-        if (string)
-          return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
-      };
 
+        // Function to escape special characters in a string for use in a regex
+        const escapeRegExp = (string) => {
+          if(string)
+            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+          };
       // Function to wrap text parts with special code blocks
-      // const wrapTextWithCodeBlocks = (text, dataArray) => {
-      //   dataArray.forEach(annotation => {
-      //     const regex = new RegExp(escapeRegExp(annotation.highlight), 'g');
-      //     text = text.replace(regex, `<code class="bg-gray-100 dark:bg-gray-700 text-red-500 p-1 rounded">${annotation.highlight}</code>`);
-      //   });
+      const wrapTextWithCodeBlocks = (text, annotations, dataArray) => {
 
-      //   console.log("i am text", text)
-      //   return text;
-      // };
 
-      const wrapTextWithCodeBlocks = (text, dataArray) => {
-        let originalText = text;  // Store the original text
-      
+        // console.log("annotations", annotations)
+
+        // let dataArray = []
+        // try {
+        //   dataArray = JSON.parse(annotations);
+        // } catch (error) {
+        //   // console.error("Error parsing JSON string:", error);
+        // }
+
+        
         dataArray.forEach(annotation => {
-          if (annotation.highlight && typeof annotation.highlight === 'string') {  // Check if highlight is valid
-            const regex = new RegExp(escapeRegExp(annotation.highlight), 'g');
-            text = text.replace(regex, `<code class="bg-gray-100 dark:bg-gray-700 text-red-500 p-1 rounded">${annotation.highlight}</code>`);
-          } else {
-            console.log('Invalid annotation highlight:', annotation.highlight);
-            // text = originalText;  // Revert to original text if there's an issue
-          }
+            console.log("i am annotation", annotation)
+          const regex = new RegExp(escapeRegExp(annotation.highlight), 'g');
+          console.log("regex", regex)
+          text = text.replace(regex, `<code class="bg-gray-100 dark:bg-gray-700 text-red-500 p-1 rounded">${annotation.highlight}</code>`);
         });
-      
-        // console.log("i am text", text);
         return text;
       };
+
       
+      // const p = document.createElement('p');
+      // p.className = 'mb-4 text-gray-900 dark:text-gray-300';
+      // p.innerHTML = wrapTextWithCodeBlocks(node.attrs.text, node.attrs.annotations);
+
       const ul = document.createElement('ul');
       ul.className = 'list-disc space-y-2 text-gray-600 dark:text-gray-400';
 
@@ -97,13 +99,14 @@ const AnnotationExtension = Node.create({
       try {
         dataArray = JSON.parse(node.attrs.annotations);
       } catch (error) {
-        console.error("Error parsing JSON string:", error);
+        // console.error("Error parsing JSON string:", error);
         return;
       }
 
       const p = document.createElement('p');
       p.className = 'mb-4 text-gray-900 dark:text-gray-300';
-      p.innerHTML = wrapTextWithCodeBlocks(node.attrs.text, dataArray);
+      p.innerHTML = wrapTextWithCodeBlocks(node.attrs.text, node.attrs.annotations, dataArray);
+
 
       dataArray.forEach((annotation, index) => {
         const li = document.createElement('li');
@@ -128,110 +131,76 @@ const AnnotationExtension = Node.create({
       const codeBlocks = p.querySelectorAll('code');
       codeBlocks.forEach((codeBlock, index) => {
         codeBlock.addEventListener('mouseenter', () => {
-          if (ul.querySelectorAll('li')[index])
-            ul.querySelectorAll('li')[index].classList.add('bg-yellow-200');
+          if(ul.querySelectorAll('li')[index])
+           ul.querySelectorAll('li')[index].classList.add('bg-yellow-200');
         });
         codeBlock.addEventListener('mouseleave', () => {
-          if (ul.querySelectorAll('li')[index])
+          if(ul.querySelectorAll('li')[index])
             ul.querySelectorAll('li')[index].classList.remove('bg-yellow-200');
         });
       });
 
       ul.querySelectorAll('li').forEach((li, index) => {
         li.addEventListener('mouseenter', () => {
-          if (codeBlocks[index])
+          if(codeBlocks[index])
             codeBlocks[index].classList.add('bg-yellow-200');
         });
         li.addEventListener('mouseleave', () => {
-          if (codeBlocks[index])
+          if(codeBlocks[index])
             codeBlocks[index].classList.remove('bg-yellow-200');
         });
       });
 
-      let lastSuccessfulAnnotations = node.attrs.annotations;
-
+      
       return {
         dom,
         update: updatedNode => {
+
+          console.log("updatedNode", updatedNode)
           if (updatedNode.attrs.text !== node.attrs.text) {
             h2.textContent = updatedNode.attrs.text;
-            p.innerHTML = wrapTextWithCodeBlocks(updatedNode.attrs.text, dataArray);
+            p.innerHTML = wrapTextWithCodeBlocks(updatedNode.attrs.text, updatedNode.attrs.annotations);
           }
           if (updatedNode.attrs.annotations !== node.attrs.annotations) {
             ul.innerHTML = '';
             let dataArray;
             try {
               dataArray = JSON.parse(updatedNode.attrs.annotations);
-              lastSuccessfulAnnotations = updatedNode.attrs.annotations; // Update the backup
-              p.innerHTML = wrapTextWithCodeBlocks(updatedNode.attrs.text, dataArray);
-
-              dataArray.forEach((annotation, index) => {
-                if(annotation.label && annotation.description){
-                const li = document.createElement('li');
-                li.innerHTML = `<strong>${annotation.label}:</strong> ${annotation.description}`;
-                li.dataset.annotationIndex = index;
-                ul.appendChild(li);}
-              });
-
-              // Reapply hover event listeners
-              const codeBlocks = p.querySelectorAll('code');
-              codeBlocks.forEach((codeBlock, index) => {
-                codeBlock.addEventListener('mouseenter', () => {
-                  if (ul.querySelectorAll('li')[index])
-                    ul.querySelectorAll('li')[index].classList.add('bg-yellow-200');
-                });
-                codeBlock.addEventListener('mouseleave', () => {
-                  if (ul.querySelectorAll('li')[index])
-                    ul.querySelectorAll('li')[index].classList.remove('bg-yellow-200');
-                });
-              });
-
-              ul.querySelectorAll('li').forEach((li, index) => {
-                li.addEventListener('mouseenter', () => {
-                  if (codeBlocks[index])
-                    codeBlocks[index].classList.add('bg-yellow-200');
-                });
-                li.addEventListener('mouseleave', () => {
-                  if (codeBlocks[index])
-                    codeBlocks[index].classList.remove('bg-yellow-200');
-                });
-              });
             } catch (error) {
               console.error("Error parsing JSON string in return:", error);
-              dataArray = JSON.parse(lastSuccessfulAnnotations); // Use the backup
-              p.innerHTML = wrapTextWithCodeBlocks(updatedNode.attrs.text, dataArray);
-
-              dataArray.forEach((annotation, index) => {
-                const li = document.createElement('li');
-                li.innerHTML = `<strong>${annotation.label}:</strong> ${annotation.description}`;
-                li.dataset.annotationIndex = index;
-                ul.appendChild(li);
-              });
-
-              // Reapply hover event listeners
-              const codeBlocks = p.querySelectorAll('code');
-              codeBlocks.forEach((codeBlock, index) => {
-                codeBlock.addEventListener('mouseenter', () => {
-                  if (ul.querySelectorAll('li')[index])
-                    ul.querySelectorAll('li')[index].classList.add('bg-yellow-200');
-                });
-                codeBlock.addEventListener('mouseleave', () => {
-                  if (ul.querySelectorAll('li')[index])
-                    ul.querySelectorAll('li')[index].classList.remove('bg-yellow-200');
-                });
-              });
-
-              ul.querySelectorAll('li').forEach((li, index) => {
-                li.addEventListener('mouseenter', () => {
-                  if (codeBlocks[index])
-                    codeBlocks[index].classList.add('bg-yellow-200');
-                });
-                li.addEventListener('mouseleave', () => {
-                  if (codeBlocks[index])
-                    codeBlocks[index].classList.remove('bg-yellow-200');
-                });
-              });
+              // dataArray = [];
+              return true;
             }
+            dataArray.forEach((annotation, index) => {
+              const li = document.createElement('li');
+              li.innerHTML = `<strong>${annotation.label}:</strong> ${annotation.description}`;
+              li.dataset.annotationIndex = index;
+              ul.appendChild(li);
+            });
+
+            // Reapply hover event listeners
+            const codeBlocks = p.querySelectorAll('code');
+            codeBlocks.forEach((codeBlock, index) => {
+              codeBlock.addEventListener('mouseenter', () => {
+                if(ul.querySelectorAll('li')[index])
+                ul.querySelectorAll('li')[index].classList.add('bg-yellow-200');
+              });
+              codeBlock.addEventListener('mouseleave', () => {
+                if(ul.querySelectorAll('li')[index])
+                ul.querySelectorAll('li')[index].classList.remove('bg-yellow-200');
+              });
+            });
+
+            ul.querySelectorAll('li').forEach((li, index) => {
+              li.addEventListener('mouseenter', () => {
+                if(codeBlocks[index])
+                codeBlocks[index].classList.add('bg-yellow-200');
+              });
+              li.addEventListener('mouseleave', () => {
+                if(codeBlocks[index])
+                codeBlocks[index].classList.remove('bg-yellow-200');
+              });
+            });
           }
           return true;
         },
