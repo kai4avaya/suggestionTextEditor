@@ -23,7 +23,10 @@ import Sortable_list from "./editor/extensions/nodeViews/sortable_list.js";
 // import Highlight from "./Highlights.js"; // Path to the custom Highlight extension
 // import AnnotationExtension from './AnnotationExtension'; // Path to your custom extension
 import AnnotationCreator from './editor/extensions/AnnotationCreator.js'; // Path to your custom extension
-
+import DragAndDrop from './editor/extensions/DragDropImages.js';
+import {TextStyle} from './editor/extensions/TextStyle.js';
+import {DragAndDropPDF} from './editor/extensions/DragDropPDF.js';
+import { PdfFormNode } from "./editor/extensions/nodeViews/pdfFormNode.js";
 const sample = {
   lists: [
     {
@@ -41,10 +44,15 @@ document.addEventListener("DOMContentLoaded", function () {
   const editor = new Editor({
     element: document.querySelector("#editor"),
     extensions: [
+
       StarterKit,
       NodeView,
+      TextStyle,
       Clicker,
       Sortable_list,
+      DragAndDrop,
+      DragAndDropPDF,
+      PdfFormNode,
       // Highlight.configure({
       //   annotations: [
       //     { from: 5, to: 10, text: "Annotation 1" },
@@ -81,7 +89,14 @@ document.addEventListener("DOMContentLoaded", function () {
     content: `
   <form-node></form-node>
 
-      `
+  <annotation-creator title="what is important here?" text="It is, other employees said, a far more inspiring place to work than a cubicle. “This is why so many people choose to work in the library,” Ms. Staudacher said.
+
+  Recently, Mr. Greene began feeding lists of his favorite books into ChatGPT and asking for new recommendations. At one point, the chatbot recommended “The Book of Disquiet,” a posthumously published autobiography from the Portuguese writer Fernando Pessoa. A friend, who knew his tastes well, had recommended that he read the same book.
+  
+  “Given the trends and patterns in things that have happened in the past, the technology can suggest things for the future,” Mr. Greene said.
+  
+  Ms. Gaffney, from OpenAI’s architectural firm, argued that this blend of the human and the machine will continue. Then she paused, before adding: “That, at least, is what I hope and feel.”" annotations='[{&quot;label&quot;:&quot;Employee Preference&quot;,&quot;highlight&quot;:&quot;a far more inspiring place to work than a cubicle&quot;,&quot;description&quot;:&quot;Employees find the library a more inspiring place to work than a cubicle.&quot;},{&quot;label&quot;:&quot;Recommendation&quot;,&quot;highlight&quot;:&quot;The Book of Disquiet”, a posthumously published autobiography&quot;,&quot;description&quot;:&quot;ChatGPT recommended &#39;The Book of Disquiet&#39; to Mr. Greene.&quot;},{&quot;label&quot;:&quot;Validation&quot;,&quot;highlight&quot;:&quot;A friend, who knew his tastes well, had recommended that he read the same book&quot;,&quot;description&quot;:&quot;Mr. Greene&#39;s friend had also recommended the same book, validating the recommendation.&quot;},{&quot;label&quot;:&quot;Predictive Capability&quot;,&quot;highlight&quot;:&quot;Given the trends and patterns in things that have happened in the past, the technology can suggest things for the future&quot;,&quot;description&quot;:&quot;Mr. Greene appreciates the predictive capability of the technology.&quot;},{&quot;label&quot;:&quot;Future of AI&quot;,&quot;highlight&quot;:&quot;That, at least, is what I hope and feel&quot;,&quot;description&quot;:&quot;Ms. Gaffney hopes and feels that the blend of human and machine will continue in the future.&quot;}]'></annotation-creator>
+  `
     ,
     editorProps: {
       attributes: {

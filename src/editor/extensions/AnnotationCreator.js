@@ -43,6 +43,9 @@ const AnnotationExtension = Node.create({
     return ({ node, getPos, editor }) => {
       const dom = document.createElement('div');
       dom.className = 'bg-white dark:bg-gray-800 p-6 shadow-lg rounded-lg font-mono flex md:flex-row flex-col';
+      // dom.style.userSelect = 'text!important';
+      dom.setAttribute('tabindex', '-1'); // Allow text selection
+
 
       const leftPanel = document.createElement('div');
       leftPanel.className = 'flex-1 md:flex-[3] p-4';
@@ -74,7 +77,7 @@ const AnnotationExtension = Node.create({
       // };
 
       const wrapTextWithCodeBlocks = (text, dataArray) => {
-        let originalText = text;  // Store the original text
+        // let originalText = text;  // Store the original text
       
         dataArray.forEach(annotation => {
           if (annotation.highlight && typeof annotation.highlight === 'string') {  // Check if highlight is valid
@@ -104,6 +107,11 @@ const AnnotationExtension = Node.create({
       const p = document.createElement('p');
       p.className = 'mb-4 text-gray-900 dark:text-gray-300';
       p.innerHTML = wrapTextWithCodeBlocks(node.attrs.text, dataArray);
+      p.setAttribute('draggable', 'false')
+      p.setAttribute('tabindex', '-1'); // Allow text selection
+      p.style.userSelect = 'text';
+      // p.setAttribute('contenteditable', 'true'); // Set contenteditable to true
+
 
       dataArray.forEach((annotation, index) => {
         const li = document.createElement('li');
@@ -119,10 +127,17 @@ const AnnotationExtension = Node.create({
       dom.appendChild(leftPanel);
       dom.appendChild(rightPanel);
 
-      // Ensure text selection is possible
-      dom.addEventListener('mousedown', (event) => {
-        event.preventDefault();
-      });
+      // // Ensure text selection is possible
+        // Allow text selection within the node view
+        dom.addEventListener('mousedown', (event) => {
+          console.log("Mouse down! Allowing selection");
+          event.stopPropagation(); // Prevent ProseMirror from handling this event
+        });
+  
+        dom.addEventListener('mouseup', (event) => {
+          console.log("Mouse up! Selection allowed");
+          event.stopPropagation(); // Prevent ProseMirror from handling this event
+        });
 
       // Add hover event listeners
       const codeBlocks = p.querySelectorAll('code');
@@ -161,9 +176,15 @@ const AnnotationExtension = Node.create({
             ul.innerHTML = '';
             let dataArray;
             try {
+
+              
               dataArray = JSON.parse(updatedNode.attrs.annotations);
               lastSuccessfulAnnotations = updatedNode.attrs.annotations; // Update the backup
               p.innerHTML = wrapTextWithCodeBlocks(updatedNode.attrs.text, dataArray);
+            // p.setAttribute('contenteditable', 'true'); // Set contenteditable to true
+
+
+              console.log("i am dataArray", dataArray)
 
               dataArray.forEach((annotation, index) => {
                 if(annotation.label && annotation.description){

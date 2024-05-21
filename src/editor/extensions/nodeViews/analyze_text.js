@@ -33,6 +33,8 @@ export default Node.create({
     return ({ node, getPos, editor }) => {
       const dom = document.createElement('div');
       dom.setAttribute('data-type', 'form-node');
+      dom.setAttribute('contenteditable', 'true'); // Set contenteditable to true
+
       dom.classList.add('w-7/8');
 
       const form = document.createElement('form');
