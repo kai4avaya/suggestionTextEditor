@@ -39,7 +39,7 @@ body, .editor-container, .tiptap-editor-content {
     overflow: hidden;
     /* Hides scrollbars */
     position: relative;
-
+    border: none;
     padding: 10px;
     
   }
@@ -52,6 +52,7 @@ body, .editor-container, .tiptap-editor-content {
     /* Allows manual resizing */
     overflow: hidden;
     resize: none;
+    border: none;
 
 
 
@@ -300,13 +301,13 @@ body, .editor-container, .tiptap-editor-content {
 /* extensions / nodeviews */
 
       .node-container {
-          border: 1px solid;
+          border: 0.50px solid;
           box-shadow: 5px 10px;
           margin: 0 30px 30px;
           padding: 10px 15px 10px 10px;
         }
         .node-heading {
-          -webkit-margin-after: 5px;
+          /* -webkit-margin-after: 5px; */
           /* margin-block-end: 5px;
           margin-left: 30px; */
           display: block;
@@ -324,8 +325,32 @@ body, .editor-container, .tiptap-editor-content {
           border: 1px solid #000;
           font-size: 12px;
           margin: 4px -6px 0 auto;
-          padding: 1px 2px;
+          padding: 4px 8px;
         }
+
+        .node-button:hover {
+          background-color: lightgrey;
+        }
+
+        .outer-container{
+          margin-top: 5px;
+        }
+
+        *, ::after, ::before {
+    box-sizing: border-box;
+    border-width: 0; /* Ensure no additional border width */
+    border-style: none;
+    border-color: currentColor; /* Use currentColor for consistency */
+    --tw-border-opacity: 1;
+    border-color: rgba(229, 231, 235, var(--tw-border-opacity));
+    --tw-shadow: 0 0 #0000;
+    --tw-ring-inset: var(--tw-empty);
+    --tw-ring-offset-width: 0px;
+    --tw-ring-offset-color: #fff;
+    --tw-ring-color: rgba(59, 130, 246, 0.5);
+    --tw-ring-offset-shadow: 0 0 #0000;
+    --tw-ring-shadow: 0 0 #0000;
+}
 
 </style>
 

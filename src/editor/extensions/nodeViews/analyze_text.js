@@ -31,14 +31,22 @@ export default Node.create({
 
   addNodeView() {
     return ({ node, getPos, editor }) => {
+      
       const dom = document.createElement('div');
-      dom.setAttribute('data-type', 'form-node');
-      dom.setAttribute('contenteditable', 'true'); // Set contenteditable to true
+      dom.classList.add("outer-container")
+      const innerDom = document.createElement('div');
+      dom.appendChild(innerDom)
 
-      dom.classList.add('w-7/8');
+      const heading = document.createElement('h3');
+      heading.classList.add("node-heading")
+      dom.setAttribute('data-type', 'form-node');
+      // dom.setAttribute('contenteditable', 'true'); // Set contenteditable to true
+
+      // dom.classList.add('w-7/8');
+      innerDom.classList.add("node-container")
 
       const form = document.createElement('form');
-      form.classList.add('p-3', 'm-4', 'border', 'border-gray-300', 'dark:border-purple-600', 'rounded-lg');
+      form.classList.add('p-3', 'm-4');
 
       const h2 = document.createElement('h2');
       h2.classList.add('text-lg', 'font-semibold', 'text-gray-700', 'mb-3');
@@ -62,7 +70,7 @@ export default Node.create({
       const divButton = document.createElement('div');
       const button = document.createElement('button');
       button.setAttribute('type', 'submit');
-      button.classList.add('submit-button', 'px-4', 'py-2', 'bg-blue-500', 'hover:bg-blue-600', 'dark:bg-blue-700', 'dark:hover:bg-blue-800', 'text-white', 'rounded-lg');
+      button.classList.add('submit-button', 'node-button');
       button.textContent = 'Submit';
       divButton.appendChild(button);
 
@@ -71,7 +79,7 @@ export default Node.create({
       form.appendChild(divTextarea);
       form.appendChild(divButton);
 
-      dom.appendChild(form);
+      innerDom.appendChild(form);
 
       // Prevent ProseMirror from handling input events inside the form
       form.addEventListener('keydown', (event) => {
