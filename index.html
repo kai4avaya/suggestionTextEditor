@@ -10,6 +10,12 @@
 
 </head>
 <style>
+
+body, .editor-container, .tiptap-editor-content {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+    }
   /* Basic editor styles */
   /* .tiptap > * + * {
     padding: 4px
@@ -178,9 +184,31 @@
   border-radius: 0 0 0.5rem 0.5rem;
 }
 
-.editor-container {
-  max-width: 600px;
-}
+ /* Small screens (default) */
+ .editor-container {
+    max-width: 80%;
+  margin: 75px auto 0;
+
+  }
+
+    /* max-width: 600px; */
+  /* Medium screens */
+  @media (min-width: 768px) {
+    .editor-container {
+      max-width: 600%;
+  margin: 75px auto 0;
+
+    }
+  }
+
+  /* Large screens */
+  @media (min-width: 1024px) {
+    .editor-container {
+      max-width: 60%;
+  margin: 75px auto 0;
+
+    }
+  }
 .highlight {
   background-color: lightgray;
 }
@@ -268,6 +296,36 @@
   width: 96px;
   height: 96px;
 }
+
+/* extensions / nodeviews */
+
+      .node-container {
+          border: 1px solid;
+          box-shadow: 5px 10px;
+          margin: 0 30px 30px;
+          padding: 10px 15px 10px 10px;
+        }
+        .node-heading {
+          -webkit-margin-after: 5px;
+          /* margin-block-end: 5px;
+          margin-left: 30px; */
+          display: block;
+          font-size: 1.17em;
+          /* margin-block-start: 1em;
+          margin-block-end: 1em;
+          margin-inline-start: 0px;
+          margin-inline-end: 0px; */
+          margin: 30px;
+          font-weight: bold;
+          unicode-bidi: isolate;
+        }
+        .node-button {
+          background-color: #fff;
+          border: 1px solid #000;
+          font-size: 12px;
+          margin: 4px -6px 0 auto;
+          padding: 1px 2px;
+        }
 
 </style>
 

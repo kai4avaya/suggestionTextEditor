@@ -7,6 +7,7 @@ import {getWikipediaSummary} from './agents/wikiSum.js';
 import http from 'http';
 // import { WebSocketServer } from 'ws';
 import WebSocket, { WebSocketServer } from 'ws';
+import {fetchEmbeddings_binary, findTopKSimilarIndices} from './agents/xenova_embeddings_binary.js'
 
 
 const app = express();
@@ -17,7 +18,10 @@ app.use(helmet());
 app.use(cors());
 
 // Built-in middleware to parse JSON
-app.use(express.json());
+// app.use(express.json());
+app.use(express.json({ limit: '50mb' })); // Set limit to 50MB or any other size you need
+
+
 
 
 const server = http.createServer(app);
@@ -97,16 +101,6 @@ app.post('/api/lang-groq', async (req, res) => {
     res.end();
   });
 
-// const result = [];
-// for await (const chunk of langGroqGenerator) {
-//   result.push(chunk);
-// }
-
-// res.json(result);
-// });
-
-
-// Start the server
 const PORT = process.env.PORT || 3000;
 
 
@@ -179,6 +173,78 @@ async function streamGroqResponse(req, res) {
 
 app.post('/api/json-stream-response', streamGroqResponse);
 
+
+app.post('/api/query_agent_conversational_memory', async (req, res) => {
+    const query = req.body;
+  
+    try {
+        // Since groq_stream is async, we await its resolution which should return the contents array
+        const contents = await groq_conversational_memory(query);
+  
+        // Set headers for a plain text response
+        res.writeHead(200, {
+            'Content-Type': 'text/plain',
+        });
+  
+        // Iterate over the contents array and write each content to the response
+        contents.forEach(content => {
+            res.write(content); // Adding a newline for readability
+        });
+  
+        // End the response
+        res.end();
+    } catch (error) {
+        console.error('Error streaming the response:', error);
+        res.status(500).end('Error processing the query', error);
+    }
+  });
+  
+
+
+///////////////////////////////////////////////////////////////
+/////////////////////// EMBEDDINGS //////////////////////////////////
+////////////////////////////////////////////////////////////////
+
+
+app.post('/api/embeddings-binary', async (req, res) => {
+    const texts = req.body.text;
+  
+    try {
+      const embeddings = await fetchEmbeddings_binary(texts);
+          res.send(embeddings);
+      } catch (error) {
+          console.error('Error handling query binary embeddings:', error);
+          res.status(500).send({ error: 'Internal server error with binary embeddings' + error});
+      }
+  })
+  
+  app.post('/api/search-embeddings-binary', async (req, res) => {
+    const targetData = req.body.targetData;
+    const dataArray = req.body.queryEmbedding
+    const k = req.body.k || 3
+  
+    try {
+      const indices = await findTopKSimilarIndices(targetData, dataArray, k=3) 
+          res.send(indices);
+      } catch (error) {
+          console.error('Error handling query binary embeddings:', error);
+          res.status(500).send({ error: 'Internal server error with findTopKSimilarIndices embeddings'});
+      }
+  })
+  
+
+  ///////////////////////// SCRAPE ///////////////////////////////////
+  ////////////////////////// SCRAPE WEBSITE AND EXTRACT TEXT //////////
+  /////////////////////////// ALLOW USER TO QUERY THIS TEXT ////////////
+
+
+  app.post('/api/scrape', async (req, res) => {
+    const url = req.body.url;
+    const scraper = new Scraper(url);
+    const text = await scraper.getText();
+
+    res.send(text);
+  })
 
 server.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);

@@ -111,6 +111,7 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { VueLoaderPlugin } = require('vue-loader');
+const webpack = require('webpack');
 
 module.exports = {
   mode: 'development',
@@ -118,6 +119,12 @@ module.exports = {
   output: {
     filename: 'bundle.js',
     path: path.resolve(__dirname, 'dist'),
+  },
+  resolve: {
+    fallback: {
+      "util": require.resolve("util/"),
+      "process": require.resolve("process/browser")
+    }
   },
   devtool: 'source-map',
   module: {
@@ -157,6 +164,9 @@ module.exports = {
     ],
   },
   plugins: [
+    new webpack.ProvidePlugin({
+      process: 'process/browser',
+    }),
     new VueLoaderPlugin(),
     new HtmlWebpackPlugin({
       template: './index.html'

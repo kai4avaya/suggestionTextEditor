@@ -27,6 +27,8 @@ import DragAndDrop from './editor/extensions/DragDropImages.js';
 import {TextStyle} from './editor/extensions/TextStyle.js';
 import {DragAndDropPDF} from './editor/extensions/DragDropPDF.js';
 import { PdfFormNode } from "./editor/extensions/nodeViews/pdfFormNode.js";
+// import {CustomMarkdown} from './editor/extensions/MarkdownExtension.js'
+// import { Markdown } from 'tiptap-markdown';
 const sample = {
   lists: [
     {
@@ -53,6 +55,8 @@ document.addEventListener("DOMContentLoaded", function () {
       DragAndDrop,
       DragAndDropPDF,
       PdfFormNode,
+      // CustomMarkdown,
+      // Markdown,
       // Highlight.configure({
       //   annotations: [
       //     { from: 5, to: 10, text: "Annotation 1" },
@@ -108,12 +112,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
   suggestion.render(editor);
   editor.on("update", () => {
+
+    // ADD INDEX, and quick scroll up, where it shows an outline refer to openai discuss as example
     // Update annotations when the editor content changes
     // const annotations = [
     //   { from: 5, to: 10, text: "Annotation 1" },
     //   { from: 15, to: 20, text: "Annotation 2" },
     // ];
     // editor.commands.setAnnotation(annotations);
+    // const markdownOutput = editor.storage.markdown.getMarkdown();
+    // console.log("markdownOutput", markdownOutput)
     console.log("editor.getJSON", editor.getJSON())
   });
 });
