@@ -159,6 +159,8 @@ async insert(object) {
   } catch (error) {
       console.error('Database error during insertion:', error);
       throw error; // Re-throw to signal error condition to caller
+  } finally {
+    console.log("completed the insertion of the object in db");
   }
 }
 
@@ -312,6 +314,8 @@ async query(queryVector, options = { limit: 10 }) {
               indexRequest.onsuccess = () => resolve(indexRequest.result || []);
               indexRequest.onerror = () => reject(indexRequest.error);
           });
+
+          console.log("i is bucket", bucket)
 
           // Process each key in the bucket if not already processed
           for (let key of bucket) {

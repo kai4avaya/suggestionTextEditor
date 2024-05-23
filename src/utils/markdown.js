@@ -6,6 +6,7 @@ export const createMarkdownRenderer = () => {
     html: true,
     linkify: true,
     typographer: true,
+    breaks: true, // This option ensures that '\n' is converted to <br>
     highlight: function (str, lang) {
       if (lang && hljs.getLanguage(lang)) {
         try {

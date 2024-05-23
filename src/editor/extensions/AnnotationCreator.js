@@ -42,7 +42,7 @@ const AnnotationExtension = Node.create({
   addNodeView() {
     return ({ node, getPos, editor }) => {
       const dom = document.createElement('div');
-      dom.className = 'bg-white dark:bg-gray-800 p-6 shadow-lg rounded-lg font-mono flex md:flex-row flex-col';
+      dom.className = 'font-mono flex md:flex-row flex-col';
       // dom.style.userSelect = 'text!important';
       dom.setAttribute('tabindex', '-1'); // Allow text selection
 
@@ -78,6 +78,7 @@ const AnnotationExtension = Node.create({
 
       const wrapTextWithCodeBlocks = (text, dataArray) => {
         // let originalText = text;  // Store the original text
+    
       
         dataArray.forEach(annotation => {
           if (annotation.highlight && typeof annotation.highlight === 'string') {  // Check if highlight is valid
@@ -88,6 +89,10 @@ const AnnotationExtension = Node.create({
             // text = originalText;  // Revert to original text if there's an issue
           }
         });
+
+        if(!text){
+          return text
+        }
       
         // console.log("i am text", text);
         return text;

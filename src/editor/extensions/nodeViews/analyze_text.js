@@ -57,14 +57,14 @@ export default Node.create({
       const input = document.createElement('input');
       input.setAttribute('type', 'text');
       input.setAttribute('placeholder', 'What should I focus on in your text?');
-      input.classList.add('input-query', 'w-full', 'p-2', 'border', 'border-zinc-300', 'dark:border-zinc-600', 'rounded-lg', 'bg-white', 'dark:bg-zinc-700', 'dark:text-white');
+      input.classList.add('node-border','input-query', 'w-full', 'p-2', 'border', 'border-black', 'dark:border-white', 'bg-white', 'dark:bg-zinc-700', 'dark:text-white');
       divInput.appendChild(input);
 
       const divTextarea = document.createElement('div');
       divTextarea.classList.add('mb-4');
       const textarea = document.createElement('textarea');
       textarea.setAttribute('placeholder', 'Input the text you want me to analyze');
-      textarea.classList.add('resize-none', 'text-area-message', 'w-full', 'p-2', 'border', 'border-zinc-300', 'dark:border-zinc-600', 'rounded-lg', 'h-24', 'bg-white', 'dark:bg-zinc-700', 'dark:text-white');
+      textarea.classList.add('node-border', 'resize-none', 'text-area-message', 'w-full', 'p-2', 'border', 'border-black', 'dark:border-white', 'h-24', 'bg-white', 'dark:bg-zinc-700', 'dark:text-white');
       divTextarea.appendChild(textarea);
 
       const divButton = document.createElement('div');

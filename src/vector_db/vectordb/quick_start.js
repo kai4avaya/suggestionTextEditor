@@ -34,41 +34,63 @@ export async function initiate(dbName)
 }
 
 
-export async function quickStart(metaData, token, isLocal = true) {
+// export async function quickStart(metaData, token, isLocal = true) {
 
-  // const text = metaData.text;
+//   // const text = metaData.text;
+//   const { text, ...otherMetaData } = metaData;
+//   const chunks = textSplitter.split(text);
+
+//   // Map each chunk to a promise that resolves to its embedding
+
+//   // Await all embedding promises
+//   let embeddings;
+
+//     embeddings = await fetchEmbeddings(chunks, token)
+//   // }
+
+
+//   for (let i = 0; i < chunks.length; i++) {
+//     const { text, ...otherMetaData } = metaData;
+//     otherMetaData.text = chunks[i]; // Assign chunks[i] to otherMetaData with the key 'text'
+//     const key = await db.insert({
+//         embedding: embeddings[i], // Use the awaited embedding
+//         ...otherMetaData // Spread the otherMetaData object, which now includes the 'text' key
+//     });
+//     inMemoryRecord.push({
+//       key: key,
+//       // embedding: embeddings[i], // Use the awaited embedding
+//       ...otherMetaData 
+//     });
+//   }
+//   return inMemoryRecord;
+// }
+
+export async function quickStart(metaData, token, isLocal = true) {
   const { text, ...otherMetaData } = metaData;
   const chunks = textSplitter.split(text);
 
-  // Map each chunk to a promise that resolves to its embedding
+  // Fetch all embeddings
+  const embeddings = await fetchEmbeddings(chunks, token);
 
-  // Await all embedding promises
-  let embeddings;
-  // if(isLocal){
-  //   const embeddingPromises = chunks.map(chunk => embed(chunk));
-
-  //  embeddings = await Promise.all(embeddingPromises);
-  // }
-  // else {
-    embeddings = await fetchEmbeddings(chunks, token)
-  // }
-
-
-  for (let i = 0; i < chunks.length; i++) {
-    const { text, ...otherMetaData } = metaData;
-    otherMetaData.text = chunks[i]; // Assign chunks[i] to otherMetaData with the key 'text'
+  // Collect all insert promises
+  const insertPromises = chunks.map(async (chunk, i) => {
+    const chunkMetaData = { ...otherMetaData, text: chunk };
     const key = await db.insert({
-        embedding: embeddings[i], // Use the awaited embedding
-        ...otherMetaData // Spread the otherMetaData object, which now includes the 'text' key
+      embedding: embeddings[i],
+      ...chunkMetaData
     });
-    inMemoryRecord.push({
+    return {
       key: key,
-      // embedding: embeddings[i], // Use the awaited embedding
-      ...otherMetaData 
-    });
-  }
+      ...chunkMetaData
+    };
+  });
+
+  // Wait for all insertions to complete
+  const inMemoryRecord = await Promise.all(insertPromises);
+
   return inMemoryRecord;
 }
+
 
 
 export async function search(query,  k={ limit: 5 },token, isLocal=true) {
@@ -76,9 +98,7 @@ export async function search(query,  k={ limit: 5 },token, isLocal=true) {
   if(k === undefined) k = { limit: 5 }
 
   let queryEmbeddings;
-  // if (isLocal)
-  //  queryEmbeddings = await embed(query)
-  // else {
+
 
   console.log("I AM QUERY", query)
     queryEmbeddings = await fetchEmbeddings(query, token)
@@ -97,13 +117,7 @@ export async function quickStart_single(metaData, token, isLocal = true) {
   // const text = metaData.text;
   const { text, ...otherMetaData } = metaData;
 
-  // Map each chunk to a promise that resolves to its embedding
 
-  // Await all embedding promises
-  // if(isLocal){
-    // const embeddingPromises = chunks.map(chunk => embed(chunk));
-
-  // const embeddings = await embed(text) // await Promise.all(embeddingPromises);
   const embeddings = fetchEmbeddings([text], token)
 
 
@@ -122,18 +136,6 @@ export async function quickStart_single(metaData, token, isLocal = true) {
     });
   return inMemoryRecord;
 }
-
-
-// export async function search(query,  k={ limit: 5 },token, isLocal=true) {
-//   let queryEmbeddings;
-//   if (isLocal)
-//    queryEmbeddings = await embed(query)
-//   else {
-//     queryEmbeddings = await fetchEmbeddings([query], token)
-//   }
-//   const results = await db.query(queryEmbeddings, k);
-//   return results
-// }
 
 
 

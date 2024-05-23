@@ -8,7 +8,7 @@ import http from 'http';
 // import { WebSocketServer } from 'ws';
 import WebSocket, { WebSocketServer } from 'ws';
 import {fetchEmbeddings_binary, findTopKSimilarIndices} from './agents/xenova_embeddings_binary.js'
-
+import {groq_conversational_memory} from './agents/groq_mem.js'
 
 const app = express();
 
@@ -176,6 +176,8 @@ app.post('/api/json-stream-response', streamGroqResponse);
 
 app.post('/api/query_agent_conversational_memory', async (req, res) => {
     const query = req.body;
+
+    console.log("query", query)
   
     try {
         // Since groq_stream is async, we await its resolution which should return the contents array
