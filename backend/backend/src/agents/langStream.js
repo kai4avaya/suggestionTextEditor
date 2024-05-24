@@ -1,4 +1,3 @@
-
 // import { ChatGroq } from "@langchain/groq";
 // // import { JsonOutputParser } from "@langchain/core/output_parsers";
 // import { config } from "dotenv";
@@ -23,7 +22,6 @@
 //   const stream = await chain.stream(input)
 //   // console.log("i am stream", stream)
 
-
 //   for await (const chunk of stream) {
 //     console.log("message from langGroq", chunk)
 //     yield chunk;
@@ -33,7 +31,6 @@
 //   }
 // }
 
-
 // async function runLangStream() {
 //   const inputText = "Your input string here"; // Replace this with your actual input
 //   for await (const chunk of langStream(inputText)) {
@@ -42,17 +39,6 @@
 // }
 
 // runLangStream();
-
-
-
-
-
-
-
-
-
-
-
 
 // import { ChatGroq } from "@langchain/groq";
 // import { StringOutputParser } from "@langchain/core/output_parsers";
@@ -124,7 +110,6 @@
 //   }
 // })();
 
-
 // import { ChatGroq } from "@langchain/groq";
 // // import { JsonOutputParser } from "@langchain/core/output_parsers";
 // import { config } from "dotenv";
@@ -149,7 +134,6 @@
 //   const stream = await chain.stream(input)
 //   // console.log("i am stream", stream)
 
-
 //   for await (const chunk of stream) {
 //     console.log("message from langGroq", chunk)
 //     yield chunk;
@@ -159,7 +143,6 @@
 //   }
 // }
 
-
 // async function runLangStream() {
 //   const inputText = "Your input string here"; // Replace this with your actual input
 //   for await (const chunk of langStream(inputText)) {
@@ -168,17 +151,6 @@
 // }
 
 // runLangStream();
-
-
-
-
-
-
-
-
-
-
-
 
 // import { ChatGroq } from "@langchain/groq";
 // import { StringOutputParser } from "@langchain/core/output_parsers";
@@ -249,8 +221,6 @@
 //     console.log(response.output);
 //   }
 // })();
-
-
 
 // import { ChatOpenAI } from "@langchain/openai";
 import {
@@ -266,11 +236,10 @@ import { ChatMessageHistory } from "@langchain/community/stores/message/in_memor
 import { config as config2 } from "dotenv";
 import { ChatGroq } from "@langchain/groq";
 import { HumanMessage, AIMessage } from "@langchain/core/messages";
-config2()
 
+config2();
 
 async function convertToLangchainMessages(messages) {
-
   const history = new ChatMessageHistory();
 
   // const langchainMessages = [];
@@ -286,10 +255,8 @@ async function convertToLangchainMessages(messages) {
   }
 
   // return langchainMessages;
-  return history
+  return history;
 }
-
-
 
 // config();(
 
@@ -301,9 +268,8 @@ const prompt = ChatPromptTemplate.fromMessages([
   ["human", "{input}"],
 ]);
 
-
 const model = new ChatGroq({
-  apiKey:  process.env.GROQ_KEY,
+  apiKey: process.env.GROQ_KEY,
   model: "mixtral-8x7b-32768",
   maxTokens: 1028,
 });
@@ -315,62 +281,59 @@ const runnable = prompt.pipe(model);
 // This is where you will store your chat history.
 // const messageHistory = new ChatMessageHistory();
 
-
 export async function* langStream(query) {
+  let { input, messages, model } = query;
 
-  let {input, messages, model} = query
+  messages = messages || [];
 
-  messages = messages || []
+  const messageHistory = await convertToLangchainMessages(messages);
+  console.log(await messageHistory.getMessages());
+  // Create your `RunnableWithMessageHistory` object, passing in the
+  // runnable created above.
+  const withHistory = new RunnableWithMessageHistory({
+    runnable,
+    // Optionally, you can use a function which tracks history by session ID.
+    getMessageHistory: (_sessionId) => messageHistory,
+    inputMessagesKey: "input",
+    // This shows the runnable where to insert the history.
+    // We set to "history" here because of our MessagesPlaceholder above.
+    historyMessagesKey: "history",
+  });
 
- const messageHistory = await convertToLangchainMessages(messages);
- console.log(await messageHistory.getMessages());
-// Create your `RunnableWithMessageHistory` object, passing in the
-// runnable created above.
-const withHistory = new RunnableWithMessageHistory({
-  runnable,
-  // Optionally, you can use a function which tracks history by session ID.
-  getMessageHistory: (_sessionId) => messageHistory,
-  inputMessagesKey: "input",
-  // This shows the runnable where to insert the history.
-  // We set to "history" here because of our MessagesPlaceholder above.
-  historyMessagesKey: "history",
-});
+  // Create your `configurable` object. This is where you pass in the
+  // `sessionId` which is used to identify chat sessions in your message store.
+  const config = { configurable: { sessionId: "1" } };
 
-// Create your `configurable` object. This is where you pass in the
-// `sessionId` which is used to identify chat sessions in your message store.
-const config  = { configurable: { sessionId: "1" } };
+  let stream = await withHistory.stream({ input: input }, config);
 
-let stream = await withHistory.stream(
-  { input: input },
-  config,
-);
-
-// let prevChunk = null
-for await (const chunk of stream) {
-  // if(chunk === prevChunk){
-  //   continue
-  // }
-  // prevChunk = chunk
-  // console.log("message from langGroq", chunk)
-  yield chunk;
-
-}
+  // let prevChunk = null
+  for await (const chunk of stream) {
+    // if(chunk === prevChunk){
+    //   continue
+    // }
+    // prevChunk = chunk
+    // console.log("message from langGroq", chunk)
+    yield chunk.content;
   }
+}
 
 // Example usage of the `langStream` function
 (async () => {
   const messages = [
     { role: "user", content: "hello\n My name is bird-turd" },
-    { role: "assistant", content: "Nice to meet you bird-turd. How can I help you today?" },
+    {
+      role: "assistant",
+      content: "Nice to meet you bird-turd. How can I help you today?",
+    },
     { role: "user", content: "I'd like some chicken with my cheese" },
-    { role: "assistant", content: "Sure I can get that for you. $10.92" },
+    { role: "assistant", content: "Sure I can get that for you. The total is $10.92" },
     { role: "user", content: "Sweet my dude!" },
-    { role: "assistant", content: "Anything else I can help with?" }
+    { role: "assistant", content: "Anything else I can help with?" },
   ];
 
-  const query = { input: "do you remember my name?", messages };
+  const query = { input: "do you remember my name? And how much do I owe?", messages };
 
   for await (const chunk of langStream(query)) {
-    console.log("MOOO               +++",chunk);
+    console.log("MOOO               +++", chunk);
   }
 })();
