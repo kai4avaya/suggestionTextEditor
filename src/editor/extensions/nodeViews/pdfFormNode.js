@@ -211,6 +211,8 @@ export const PdfFormNode = Node.create({
 
             const html = renderMarkdown(currResp);
             // console.log("foundIndices", html);
+
+            console.log("i will delete", responseStartPos, responseEndPos);
   // Remove previous content if it exists
   if (responseStartPos !== responseEndPos) {
     editor.commands.deleteRange({
@@ -221,13 +223,14 @@ export const PdfFormNode = Node.create({
 
   // Insert new content and update the end position
   editor.chain().focus().insertContentAt(responseStartPos, html).run();
-  responseEndPos = responseStartPos + html.length;
+  responseEndPos = editor.state.selection.$anchor.pos //responseStartPos + html.length;
 
+  console.log("responseEndPos", responseEndPos);
   // Update the end position considering the length of the inserted HTML
   const insertedNode = editor.view.state.doc.nodeAt(responseStartPos);
-  if (insertedNode) {
-    responseEndPos = responseStartPos + insertedNode.nodeSize;
-  }
+  // if (insertedNode) {
+  //   responseEndPos = responseStartPos + insertedNode.nodeSize;
+  // }
           }
         } catch (error) {
           console.error("Error during search:", error);
