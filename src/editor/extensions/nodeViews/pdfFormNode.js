@@ -1,16 +1,14 @@
-
-import { Node } from '@tiptap/core';
-import pdfIcon from '../../../../assets/pdf.png';
-import { searchVectorizedText } from '../../../memory/memory.js';
-import {createMarkdownRenderer} from '../../../utils/markdown.js'
-import {query_agent} from '../../../agents/streamAgent.js'
-import {streamAgentPrompt} from '../../../../confgs/envConfigs.js'
-
+import { Node } from "@tiptap/core";
+import pdfIcon from "../../../../assets/pdf.png";
+import { searchVectorizedText } from "../../../memory/memory.js";
+import { createMarkdownRenderer } from "../../../utils/markdown.js";
+import { query_agent, query_agent_lang } from "../../../agents/streamAgent.js";
+import { streamAgentPrompt } from "../../../../confgs/envConfigs.js";
 
 export const PdfFormNode = Node.create({
-  name: 'pdfFormNode',
+  name: "pdfFormNode",
 
-  group: 'block',
+  group: "block",
 
   atom: true,
 
@@ -20,22 +18,22 @@ export const PdfFormNode = Node.create({
         default: pdfIcon,
       },
       title: {
-        default: '',
+        default: "",
       },
       href: {
-        default: '',
+        default: "",
       },
       filename: {
-        default: '',
+        default: "",
       },
       filesize: {
-        default: '',
+        default: "",
       },
       dateAccessed: {
         default: new Date().toLocaleString(),
       },
       dbName: {
-        default: '',
+        default: "",
       },
       vectorIndices: {
         default: [],
@@ -52,109 +50,119 @@ export const PdfFormNode = Node.create({
   },
 
   renderHTML({ HTMLAttributes }) {
-    return ['div', mergeAttributes(HTMLAttributes, { 'data-type': 'pdf-form-node' })];
+    return [
+      "div",
+      mergeAttributes(HTMLAttributes, { "data-type": "pdf-form-node" }),
+    ];
   },
 
   addNodeView() {
-    return ({ node }) => {
+    // return ({ node }) => {
+      return ({ node, editor, getPos }) => {
       // Create the heading element
-      const heading = document.createElement('h3');
-      heading.textContent = 'PDF Analysis';
-      heading.classList.add('heading');
-      heading.classList.add('node-heading');
-
-      
+      const heading = document.createElement("h3");
+      heading.textContent = "PDF Analysis";
+      heading.classList.add("heading");
+      heading.classList.add("node-heading");
 
       // Create the main dom element
-      const dom = document.createElement('div');
-      const innerDom = document.createElement('div');
-      dom.setAttribute('data-type', 'pdf-form-node');
-      innerDom.classList.add('pdf-form-node-container');
-      innerDom.classList.add('node-container');
-
+      const dom = document.createElement("div");
+      const innerDom = document.createElement("div");
+      dom.setAttribute("data-type", "pdf-form-node");
+      innerDom.classList.add("pdf-form-node-container");
+      innerDom.classList.add("node-container");
 
       // Append the heading to the dom element
       dom.appendChild(heading);
       dom.appendChild(innerDom);
 
-      const info = document.createElement('div');
-      info.classList.add('flex', 'flex-col', 'mb-2', 'font-mono', 'text-sm');
+      const info = document.createElement("div");
+      info.classList.add("flex", "flex-col", "mb-2", "font-mono", "text-sm");
 
-      const title = document.createElement('div');
+      const title = document.createElement("div");
       title.textContent = `Title: ${node.attrs.title || node.attrs.filename}`;
       info.appendChild(title);
 
-      const filesize = document.createElement('div');
+      const filesize = document.createElement("div");
       filesize.textContent = `File Size: ${node.attrs.filesize}`;
       info.appendChild(filesize);
 
-      const dateAccessed = document.createElement('div');
+      const dateAccessed = document.createElement("div");
       dateAccessed.textContent = `Date Accessed: ${node.attrs.dateAccessed}`;
       info.appendChild(dateAccessed);
 
       innerDom.appendChild(info);
 
-      const img = document.createElement('img');
+      const img = document.createElement("img");
       img.src = node.attrs.src || pdfIcon;
-      img.style.width = '96px';
-      img.style.height = '96px';
-      img.classList.add('flex-shrink-0');
+      img.style.width = "96px";
+      img.style.height = "96px";
+      img.classList.add("flex-shrink-0");
       innerDom.appendChild(img);
 
-      const formContainer = document.createElement('div');
-      formContainer.classList.add('form-container');
+      const formContainer = document.createElement("div");
+      formContainer.classList.add("form-container");
 
-      const form = document.createElement('form');
-      form.classList.add('flex', 'flex-col', 'space-y-2', 'flex-grow');
+      const form = document.createElement("form");
+      form.classList.add("flex", "flex-col", "space-y-2", "flex-grow");
 
-      const inputContainer = document.createElement('div');
-      inputContainer.classList.add('flex', 'items-center', 'space-x-2');
+      const inputContainer = document.createElement("div");
+      inputContainer.classList.add("flex", "items-center", "space-x-2");
 
-      const input = document.createElement('input');
-      input.type = 'text';
-      input.placeholder = 'What is your query?';
-      input.classList.add('node-border', 'p-2', 'border', 'border-gray-300', 'rounded', 'flex-grow');
+      const input = document.createElement("input");
+      input.type = "text";
+      input.placeholder = "What is your query?";
+      input.classList.add(
+        "node-border",
+        "p-2",
+        "border",
+        "border-gray-300",
+        "rounded",
+        "flex-grow"
+      );
       inputContainer.appendChild(input);
 
       // Create the spinner element
-      const spinner = document.createElement('div');
-      spinner.classList.add('spinner', 'hidden');
+      const spinner = document.createElement("div");
+      spinner.classList.add("spinner", "hidden");
       inputContainer.appendChild(spinner);
 
       form.appendChild(inputContainer);
 
-      const buttonContainer = document.createElement('div');
-      buttonContainer.classList.add('flex', 'items-center', 'space-x-8');
+      const buttonContainer = document.createElement("div");
+      buttonContainer.classList.add("flex", "items-center", "space-x-8");
 
-      const button = document.createElement('button');
-      button.type = 'submit';
-      button.textContent = 'Submit';
-      button.classList.add('custom-button');
-      button.classList.add('node-button');
+      const button = document.createElement("button");
+      button.type = "submit";
+      button.textContent = "Submit";
+      button.classList.add("custom-button");
+      button.classList.add("node-button");
 
       buttonContainer.appendChild(button);
 
-      const toggleContainer = document.createElement('div');
-      toggleContainer.classList.add('flex', 'items-center', 'ml-2');
+      const toggleContainer = document.createElement("div");
+      toggleContainer.classList.add("flex", "items-center", "ml-2");
 
-      const toggleLabel = document.createElement('label');
-      toggleLabel.classList.add('flex', 'items-center', 'cursor-pointer');
+      const toggleLabel = document.createElement("label");
+      toggleLabel.classList.add("flex", "items-center", "cursor-pointer");
 
-      const toggleInput = document.createElement('input');
-      toggleInput.type = 'checkbox';
-      toggleInput.classList.add('sr-only');
+      const toggleInput = document.createElement("input");
+      toggleInput.type = "checkbox";
+      toggleInput.classList.add("sr-only");
 
-      const toggleSpan = document.createElement('span');
-      toggleSpan.classList.add('toggle-switch');
+      const toggleSpan = document.createElement("span");
+      toggleSpan.classList.add("toggle-switch");
 
-      toggleInput.addEventListener('change', () => {
-        toggleSpan.classList.toggle('checked');
+      toggleInput.addEventListener("change", () => {
+        toggleSpan.classList.toggle("checked");
       });
 
       toggleLabel.appendChild(toggleInput);
       toggleLabel.appendChild(toggleSpan);
       toggleContainer.appendChild(toggleLabel);
-      toggleContainer.appendChild(document.createTextNode(' Show Highlighted Text'));
+      toggleContainer.appendChild(
+        document.createTextNode(" Show Highlighted Text")
+      );
       buttonContainer.appendChild(toggleContainer);
 
       form.appendChild(buttonContainer);
@@ -164,60 +172,90 @@ export const PdfFormNode = Node.create({
       form.onsubmit = async (e) => {
         e.preventDefault();
 
-        if (isSubmitting || input.value === '') return;
+        if (isSubmitting || input.value === "") return;
 
         isSubmitting = true;
-        spinner.classList.remove('hidden'); // Show the spinner
+        spinner.classList.remove("hidden"); // Show the spinner
 
         try {
-          const foundIndices = await searchVectorizedText(node.attrs.dbName, input.value, 5, "none");
-          let currResp = ''
+          const foundIndices = await searchVectorizedText(
+            node.attrs.dbName,
+            input.value,
+            5,
+            "none"
+          );
+          let currResp = "";
           const queryOfUser = input.value; // Store the user input
-          input.value = ''; // Clear the input field after storing its value
+          input.value = ""; // Clear the input field after storing its value
 
-          const texts = foundIndices.map(item => item.object.text); // Assuming foundIndices is an array of items with 'object.text'
-          const newPrompt = `${streamAgentPrompt} BACKGROUND: ${texts.join('\n')} \n QUERY: ${queryOfUser}`;
-          const query = { prompt: newPrompt, model: "llama3-8b-8192", messages: [] };
+          const texts = foundIndices.map((item) => item.object.text); // Assuming foundIndices is an array of items with 'object.text'
+          const newPrompt = `${streamAgentPrompt} BACKGROUND: ${texts.join(
+            "\n"
+          )} \n QUERY: ${queryOfUser}`;
+          const query = {
+            prompt: newPrompt,
+            model: "llama3-8b-8192",
+            messages: [],
+          };
           const renderMarkdown = createMarkdownRenderer();
-      
-          for await (const chunk of query_agent(query, "none")) {
+          // let responseElementPosition;
 
-        currResp += chunk;
+        const responseStartPos = getPos() + node.nodeSize;
+        let responseEndPos = responseStartPos;
 
-        console.log("i am chunk!", chunk);
 
-          const html = renderMarkdown(currResp)
-          console.log("foundIndices", html);
+          for await (const chunk of query_agent_lang(query, "none")) {
+            currResp += chunk;
 
+            // console.log("i am chunk!", chunk);
+
+            const html = renderMarkdown(currResp);
+            // console.log("foundIndices", html);
+  // Remove previous content if it exists
+  if (responseStartPos !== responseEndPos) {
+    editor.commands.deleteRange({
+      from: responseStartPos,
+      to: responseEndPos,
+    });
+  }
+
+  // Insert new content and update the end position
+  editor.chain().focus().insertContentAt(responseStartPos, html).run();
+  responseEndPos = responseStartPos + html.length;
+
+  // Update the end position considering the length of the inserted HTML
+  const insertedNode = editor.view.state.doc.nodeAt(responseStartPos);
+  if (insertedNode) {
+    responseEndPos = responseStartPos + insertedNode.nodeSize;
+  }
           }
-   
         } catch (error) {
           console.error("Error during search:", error);
         } finally {
-          spinner.classList.add('hidden'); // Hide the spinner
+          spinner.classList.add("hidden"); // Hide the spinner
           isSubmitting = false;
         }
       };
 
       // Allow interactions with form elements by stopping ProseMirror event handling
       function stopProseMirrorHandling(e) {
-        const toggleSwitch = formContainer.querySelector('.toggle-switch');
+        const toggleSwitch = formContainer.querySelector(".toggle-switch");
         // Check if the event target is not the toggle switch or its children
         if (!toggleSwitch.contains(e.target)) {
           e.stopPropagation();
         }
       }
 
-      dom.addEventListener('mousedown', stopProseMirrorHandling);
-      dom.addEventListener('mouseup', stopProseMirrorHandling);
-      dom.addEventListener('click', stopProseMirrorHandling);
-      dom.addEventListener('keydown', stopProseMirrorHandling);
+      dom.addEventListener("mousedown", stopProseMirrorHandling);
+      dom.addEventListener("mouseup", stopProseMirrorHandling);
+      dom.addEventListener("click", stopProseMirrorHandling);
+      dom.addEventListener("keydown", stopProseMirrorHandling);
 
       formContainer.appendChild(form);
       innerDom.appendChild(formContainer);
 
       // Add styles for the toggle switch, spinner, and heading
-      const style = document.createElement('style');
+      const style = document.createElement("style");
       style.textContent = `
         .toggle-switch {
           width: 34px;

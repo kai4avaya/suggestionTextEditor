@@ -277,17 +277,13 @@ const model = new ChatGroq({
 // Create a simple runnable which just chains the prompt to the model.
 const runnable = prompt.pipe(model);
 
-// Define your session history store.
-// This is where you will store your chat history.
-// const messageHistory = new ChatMessageHistory();
-
 export async function* langStream(query) {
-  let { input, messages, model } = query;
+  let { prompt, messages, model } = query;
 
   messages = messages || [];
 
   const messageHistory = await convertToLangchainMessages(messages);
-  console.log(await messageHistory.getMessages());
+  // console.log(await messageHistory.getMessages());
   // Create your `RunnableWithMessageHistory` object, passing in the
   // runnable created above.
   const withHistory = new RunnableWithMessageHistory({
@@ -304,7 +300,8 @@ export async function* langStream(query) {
   // `sessionId` which is used to identify chat sessions in your message store.
   const config = { configurable: { sessionId: "1" } };
 
-  let stream = await withHistory.stream({ input: input }, config);
+  console.log("i am input", prompt)
+  let stream = await withHistory.stream({ input: prompt }, config);
 
   // let prevChunk = null
   for await (const chunk of stream) {
@@ -318,22 +315,22 @@ export async function* langStream(query) {
 }
 
 // Example usage of the `langStream` function
-(async () => {
-  const messages = [
-    { role: "user", content: "hello\n My name is bird-turd" },
-    {
-      role: "assistant",
-      content: "Nice to meet you bird-turd. How can I help you today?",
-    },
-    { role: "user", content: "I'd like some chicken with my cheese" },
-    { role: "assistant", content: "Sure I can get that for you. The total is $10.92" },
-    { role: "user", content: "Sweet my dude!" },
-    { role: "assistant", content: "Anything else I can help with?" },
-  ];
+// (async () => {
+//   const messages = [
+//     { role: "user", content: "hello\n My name is bird-turd" },
+//     {
+//       role: "assistant",
+//       content: "Nice to meet you bird-turd. How can I help you today?",
+//     },
+//     { role: "user", content: "I'd like some chicken with my cheese" },
+//     { role: "assistant", content: "Sure I can get that for you. The total is $10.92" },
+//     { role: "user", content: "Sweet my dude!" },
+//     { role: "assistant", content: "Anything else I can help with?" },
+//   ];
 
-  const query = { input: "do you remember my name? And how much do I owe?", messages };
+//   const query = { input: "do you remember my name? And how much do I owe?", messages };
 
-  for await (const chunk of langStream(query)) {
-    console.log("MOOO               +++", chunk);
-  }
-})();
+//   for await (const chunk of langStream(query)) {
+//     console.log("MOOO               +++", chunk);
+//   }
+// })();

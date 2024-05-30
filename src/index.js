@@ -29,6 +29,8 @@ import {DragAndDropPDF} from './editor/extensions/DragDropPDF.js';
 import { PdfFormNode } from "./editor/extensions/nodeViews/pdfFormNode.js";
 // import {CustomMarkdown} from './editor/extensions/MarkdownExtension.js'
 // import { Markdown } from 'tiptap-markdown';
+import MarkdownView from './editor/extensions/nodeViews/markdown_extension.js'
+import  MarkdownNode  from './editor/extensions/MarkdownExtension2.js'
 const sample = {
   lists: [
     {
@@ -55,6 +57,11 @@ document.addEventListener("DOMContentLoaded", function () {
       DragAndDrop,
       DragAndDropPDF,
       PdfFormNode,
+      MarkdownNode.extend({
+        addNodeView() {
+          return (node, view, getPos, decorations) => new MarkdownView(node, view, getPos, decorations);
+        },
+      }),
       // CustomMarkdown,
       // Markdown,
       // Highlight.configure({
@@ -100,6 +107,14 @@ document.addEventListener("DOMContentLoaded", function () {
   “Given the trends and patterns in things that have happened in the past, the technology can suggest things for the future,” Mr. Greene said.
   
   Ms. Gaffney, from OpenAI’s architectural firm, argued that this blend of the human and the machine will continue. Then she paused, before adding: “That, at least, is what I hope and feel.”" annotations='[{&quot;label&quot;:&quot;Employee Preference&quot;,&quot;highlight&quot;:&quot;a far more inspiring place to work than a cubicle&quot;,&quot;description&quot;:&quot;Employees find the library a more inspiring place to work than a cubicle.&quot;},{&quot;label&quot;:&quot;Recommendation&quot;,&quot;highlight&quot;:&quot;The Book of Disquiet”, a posthumously published autobiography&quot;,&quot;description&quot;:&quot;ChatGPT recommended &#39;The Book of Disquiet&#39; to Mr. Greene.&quot;},{&quot;label&quot;:&quot;Validation&quot;,&quot;highlight&quot;:&quot;A friend, who knew his tastes well, had recommended that he read the same book&quot;,&quot;description&quot;:&quot;Mr. Greene&#39;s friend had also recommended the same book, validating the recommendation.&quot;},{&quot;label&quot;:&quot;Predictive Capability&quot;,&quot;highlight&quot;:&quot;Given the trends and patterns in things that have happened in the past, the technology can suggest things for the future&quot;,&quot;description&quot;:&quot;Mr. Greene appreciates the predictive capability of the technology.&quot;},{&quot;label&quot;:&quot;Future of AI&quot;,&quot;highlight&quot;:&quot;That, at least, is what I hope and feel&quot;,&quot;description&quot;:&quot;Ms. Gaffney hopes and feels that the blend of human and machine will continue in the future.&quot;}]'></annotation-creator>
+  
+  
+  <div data-type="markdown" data-content="# Hello World\n\nThis is a markdown example."></div>
+  
+  <div data-type="markdown" data-content="# Hello World\n\nThis is a markdown example."></div>
+
+  <div data-type="markdown" data-content="# Hello World\n\nThis is a markdown example."></div>
+
   `
     ,
     editorProps: {

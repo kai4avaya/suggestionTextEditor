@@ -9,6 +9,7 @@ import http from 'http';
 import WebSocket, { WebSocketServer } from 'ws';
 import {fetchEmbeddings_binary, findTopKSimilarIndices} from './agents/xenova_embeddings_binary.js'
 import {groq_conversational_memory} from './agents/groq_mem.js'
+import {langStream} from './agents/langStream.js'
 
 const app = express();
 
@@ -201,6 +202,31 @@ app.post('/api/query_agent_conversational_memory', async (req, res) => {
     }
   });
   
+
+  
+app.post('/api/query_agent_conversational_lang_memory', async (req, res) => {
+  const query = req.body;
+
+  console.log("query", query);
+
+  try {
+    // Set headers for a plain text response
+    res.writeHead(200, {
+      'Content-Type': 'text/plain',
+    });
+
+    // Since langStream is an async generator, we use a for-await-of loop
+    for await (const content of langStream(query)) {
+      res.write(content); // Adding a newline for readability
+    }
+
+    // End the response after the stream is done
+    res.end();
+  } catch (error) {
+    console.error('Error streaming the response:', error);
+    res.status(500).send('Error processing the query');
+  }
+});
 
 
 ///////////////////////////////////////////////////////////////
