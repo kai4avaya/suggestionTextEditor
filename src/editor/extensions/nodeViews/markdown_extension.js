@@ -17,14 +17,30 @@ class MarkdownView {
 
   renderMarkdown() {
     const md = markdownIt();
-    console.log("node.attrs", this.node, this.node.attrs)
-    this.contentDOM.innerHTML = md.render(this.node.HTMLAttributes['data-content']);
-  }
+    console.log("this.node", this.node)
+    console.log("this.dom", this.dom)
+    const content = md.render(this.node.HTMLAttributes['data-content']);
+    this.contentDOM.innerHTML =content
+    console.log("content", content)
+    console.log("this.contentDOM", this.contentDOM)
+    this.dom.innerHTML = content
+  // Apply custom styles to headings
+  this.applyCustomStyles();
+}
+
+applyCustomStyles() {
+  const headings = this.contentDOM.querySelectorAll('h1, h2, h3, h4, h5, h6');
+  headings.forEach(heading => {
+    heading.style.fontSize = 'initial';  // Or any specific size you want
+    heading.style.fontWeight = 'initial';  // Or any specific weight you want
+  });
+}
 
   update(node, decorations) {
     console.log("node", node)
     console.log("this.node", this.node)
-    if (node.attrs.content !== this.node.HTMLAttributes['data-content']) {
+    console.log("decorations", decorations)
+    if (node.HTMLAttributes['data-content'] !== this.node.HTMLAttributes['data-content']) {
       this.node = node;
       this.renderMarkdown();
     }
@@ -40,7 +56,8 @@ class MarkdownView {
   }
 
   setDomContent(content) {
-    this.node.attrs.content = content;
+    console.log("i am set domContent", content)
+    this.node.HTMLAttributes['data-content'] = content;
     this.renderMarkdown();
   }
 

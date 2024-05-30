@@ -5,7 +5,8 @@ const MarkdownNode = Node.create({
 
   group: 'block',
 
-  content: 'text*',
+//   content: 'text*',
+content: 'block*', // Allow block content inside the markdown node
 
   parseHTML() {
     return [{ tag: 'div[data-type="markdown"]' }];

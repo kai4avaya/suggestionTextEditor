@@ -225,9 +225,9 @@ export const PdfFormNode = Node.create({
   editor.chain().focus().insertContentAt(responseStartPos, html).run();
   responseEndPos = editor.state.selection.$anchor.pos //responseStartPos + html.length;
 
-  console.log("responseEndPos", responseEndPos);
+  // console.log("responseEndPos", responseEndPos);
   // Update the end position considering the length of the inserted HTML
-  const insertedNode = editor.view.state.doc.nodeAt(responseStartPos);
+  // const insertedNode = editor.view.state.doc.nodeAt(responseStartPos);
   // if (insertedNode) {
   //   responseEndPos = responseStartPos + insertedNode.nodeSize;
   // }
