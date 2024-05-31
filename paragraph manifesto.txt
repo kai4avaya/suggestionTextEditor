@@ -1,0 +1,13 @@
+paraGraph
+
+every item of generated text is theRoom selectable and editable
+we cna add in assignments
+everything in edtior is vectorized and searchable
+we need to constantly update the database indexdb when things get deleted
+ its local first 
+we can allow multiple editors
+you can log in via local and it will remember you on multiple devices
+show cursors of editors
+it will email you reminders
+you own your data
+add a website and scrape it 

@@ -2,7 +2,7 @@
 
 import { Node, mergeAttributes } from '@tiptap/core';
 import { jsonAgent } from '../../../agents/jsonAgent';
-import {annotationSerializer} from '../../editorUtils/annotationSerializer'
+import {annotationSerializer, parseFirstValidJSON} from '../../editorUtils/annotationSerializer'
 
 export default Node.create({
   name: 'formNode',
@@ -113,20 +113,16 @@ export default Node.create({
 
         for await (const chunk of jsonAgent(messageText, queryText)) {
           let annotationNode = new TextDecoder("utf-8").decode(chunk);
-          // try {
           
-           
-
+          console.log("annotationNode", annotationNode)
+          
             if (count === 0){
               annotationNode = annotationSerializer(annotationNode, messageText, queryText);
             }
 
-//             const regex = /annotations='([^']*)'/;
-// const match = str.match(regex);
-// const annotations = match ? match[1] : null;
-
             if (previousNodePosition !== null) {
 
+              console.log("annotationNode", annotationNode)
               try{
                 JSON.parse(annotationNode);
 
@@ -143,7 +139,20 @@ export default Node.create({
               });
             }  catch(e){
               // return true;
-              console.log("error JSON PARSE", e)
+              console.log("error JSON PARSE removing duplicates!", e)
+              try{
+               const removeDuplicates = parseFirstValidJSON(annotationNode)
+                console.log("removeDuplicates", removeDuplicates)
+               editor.commands.updateAttributes('annotationCreator', {
+                text: messageText,// annotationNode.content[0].text,
+
+                annotations: JSON.stringify(removeDuplicates) //annotationNode.attrs.annotations,
+              });
+
+              }
+              catch (e){
+                console.error("Error parsing  2nd time Repeating duplicates - JSON string:", e);
+              }
             
             }
 

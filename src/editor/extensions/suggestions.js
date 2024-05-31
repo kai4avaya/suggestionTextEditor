@@ -100,6 +100,7 @@ export default {
       }
 
       if (event.key === "Enter" && popup && popup[0].state.isVisible) {
+        console.log("nerd Enter")
         removeLastCharacter();
         const selectedItem = getCurrentSelectedItem();
         if (selectedItem) {

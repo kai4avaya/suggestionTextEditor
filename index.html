@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Plain Text Editor</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@^2.2.19/dist/tailwind.min.css" />
-  <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+  <!-- <script src="https://cdn.jsdelivr.net/npm/vue@2"></script> -->
 
 </head>
 <style>
@@ -347,6 +347,19 @@ h6 {
     padding: 10px 15px 10px 10px;
   }
 
+  .node-menu-button {
+  border: 0.50px solid;
+  box-shadow: 2px 5px royalblue;
+  border-color: royalblue;
+  /* margin: 0 30px 30px; */
+  /* padding: 10px 15px 10px 10px; */
+  padding: 2px 6px;;
+  margin: 8px;
+}
+
+.node-menu-button:active {
+  transform: translateY(2px);
+}
   .node-heading {
     /* -webkit-margin-after: 5px; */
     /* margin-block-end: 5px;
@@ -401,24 +414,74 @@ h6 {
   .node-border{
     border: 1px solid;
   }
+
+
+  /* slash menu */
+  .custom-menu {
+  background: white;
+  border: 1px solid #ccc;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+}
+
+.menu-item {
+  padding: 8px 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.menu-item:hover, .menu-item.selected {
+  background: #f0f0f0;
+}
+
+/* handle  */
+.resize-handle {
+  width: 5px;
+  cursor: col-resize;
+  background-color: transparent;
+  transition: background-color 0.2s, border 0.2s;
+  border: none;
+}
+
+.resize-handle:hover {
+  background-color: #ccc;
+  border: 1px solid #888;
+}
+
+
 </style>
 
 <body>
 
   <div class="editor-container m-auto editor rounded-lg border border-zinc-300 bg-white">
-    <div class="toolbar flex items-center border-b border-zinc-300 p-2">
-      <select class="format-dropdown mr-2 rounded border bg-white p-1">
+    <div class="toolbar flex items-center border-b border-gray-300 p-2 bg-gray-50">
+      <select class="format-dropdown node-menu-button">
         <option>Normal</option>
         <option>Heading 1</option>
         <option>Heading 2</option>
         <option>Heading 3</option>
       </select>
-      <button class="tool-button mx-1" onclick="execCmd('bold')"><b>B</b></button>
-      <button class="tool-button mx-1" onclick="execCmd('italic')"><i>I</i></button>
-      <button class="tool-button mx-1" onclick="execCmd('underline')"><u>U</u></button>
-      <button class="tool-button mx-1" onclick="execCmd('insertUnorderedList')">&#8226;</button>
-      <button class="tool-button mx-1" onclick="execCmd('insertOrderedList')">&#35;</button>
-      <button class="tool-button mx-1" onclick="execCmd('insertParagraph')">&lt;p&gt;</button>
+      <button class="tool-button node-menu-button hover:bg-gray-200" onclick="execCmd('bold')">
+        <b>B</b>
+      </button>
+      <button class="tool-button node-menu-button hover:bg-gray-200" onclick="execCmd('italic')">
+        <i>I</i>
+      </button>
+      <button class="tool-button node-menu-button hover:bg-gray-200" onclick="execCmd('underline')">
+        <u>U</u>
+      </button>
+      <button class="tool-button node-menu-button hover:bg-gray-200" onclick="execCmd('insertUnorderedList')">
+        &#8226;
+      </button>
+      <button class="tool-button node-menu-button hover:bg-gray-200" onclick="execCmd('insertOrderedList')">
+        &#35;
+      </button>
+      <button class="tool-button node-menu-button hover:bg-gray-200" onclick="execCmd('insertParagraph')">
+        &lt;p&gt;
+      </button>
     </div>
     <!-- <div id="textArea" contenteditable="true" class="text-area h-40 p-3"></div> -->
     <div id="editor">

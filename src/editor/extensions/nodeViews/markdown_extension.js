@@ -1,11 +1,17 @@
 import markdownIt from 'markdown-it';
+import { DOMParser as ProseMirrorDOMParser } from 'prosemirror-model';
+import { TextSelection } from 'prosemirror-state';
 
 class MarkdownView {
   constructor(node, view, getPos, decorations) {
     this.node = node;
-    this.view = view;
+    this.view = view; // This should now be correctly passed
     this.getPos = getPos;
     this.decorations = decorations;
+
+    this.parser = new DOMParser(); // Create a new DOMParser instance
+    // const doc = parser.parseFromString(htmlString, 'text/html'); // Parse the string into an HTML document
+
 
     this.dom = document.createElement('div');
     this.contentDOM = document.createElement('div');
@@ -19,34 +25,46 @@ class MarkdownView {
     const md = markdownIt();
     console.log("this.node", this.node)
     console.log("this.dom", this.dom)
-    const content = md.render(this.node.HTMLAttributes['data-content']);
-    this.contentDOM.innerHTML =content
-    console.log("content", content)
-    console.log("this.contentDOM", this.contentDOM)
-    this.dom.innerHTML = content
-  // Apply custom styles to headings
-  this.applyCustomStyles();
-}
+    console.log(" this.contentDOM ", this.contentDOM)
+    if (this.node.HTMLAttributes['data-content']) {
+      const content = md.render(this.node.HTMLAttributes['data-content']);
 
-applyCustomStyles() {
-  const headings = this.contentDOM.querySelectorAll('h1, h2, h3, h4, h5, h6');
-  headings.forEach(heading => {
-    heading.style.fontSize = 'initial';  // Or any specific size you want
-    heading.style.fontWeight = 'initial';  // Or any specific weight you want
-  });
-}
+      console.log("content", content)
+      this.contentDOM.innerHTML = content;
+      this.dom.innerHTML = content;
+
+      // Parse the content using the Tiptap editor schema
+      const schema = this.node.editor.view.state.schema;
+      const parser = ProseMirrorDOMParser.fromSchema(schema);
+      const doc = parser.parse(this.contentDOM);
+
+      const tr = this.node.editor.view.state.tr.replaceWith(0, this.node.editor.view.state.doc.content.size, doc);
+      this.node.editor.view.dispatch(tr);
+    }
+
+    // Apply custom styles to headings
+    this.applyCustomStyles();
+  }
+
+  applyCustomStyles() {
+    const headings = this.contentDOM.querySelectorAll('h1, h2, h3, h4, h5, h6');
+    headings.forEach(heading => {
+      heading.style.fontSize = 'initial';  // Or any specific size you want
+      heading.style.fontWeight = 'initial';  // Or any specific weight you want
+    });
+  }
 
   update(node, decorations) {
     console.log("node", node)
     console.log("this.node", this.node)
     console.log("decorations", decorations)
-    if (node.HTMLAttributes['data-content'] !== this.node.HTMLAttributes['data-content']) {
+    if(node.attrs['content'] && this.node.HTMLAttributes){
+    if (node.attrs['content'] !== this.node.HTMLAttributes['data-content']) {
       this.node = node;
       this.renderMarkdown();
-    }
+    }}
     return true;
   }
-
   selectNode() {
     this.dom.classList.add('ProseMirror-selectednode');
   }
@@ -56,13 +74,37 @@ applyCustomStyles() {
   }
 
   setDomContent(content) {
-    console.log("i am set domContent", content)
-    this.node.HTMLAttributes['data-content'] = content;
+    this.node.attrs['content'] = content;
     this.renderMarkdown();
   }
 
-  stopEvent() {
+  stopEvent(event) {
+    if (this.dom.contains(document.activeElement)) {
+      if (event.key === 'Enter') {
+        this.handleEnterKey(event);
+        return true;
+      }
+      if (event.key === 'Backspace') {
+        return false; // Allow Backspace key to propagate to the editor
+      }
+    }
     return false;
+  }
+
+  handleEnterKey(event) {
+    event.preventDefault();
+    const { state, dispatch } = this.view;
+    const { $from, from } = state.selection;
+
+    // Insert a new paragraph at the current position
+    const newParagraph = state.schema.nodes.paragraph.create();
+    let tr = state.tr.insert(from, newParagraph);
+
+    // Set the selection to the new paragraph
+    const newPos = tr.mapping.map(from) + 1;
+    tr = tr.setSelection(TextSelection.create(tr.doc, newPos));
+
+    dispatch(tr.scrollIntoView());
   }
 
   ignoreMutation() {
