@@ -100,6 +100,8 @@ document.addEventListener("DOMContentLoaded", function () {
     ],
 
     content: `
+    
+  <div data-type="markdown" data-content="# Hello World\n\nThis is a markdown example."># Hello World\n\nThis is a markdown example.</div>
   <form-node></form-node>
   `
     ,
@@ -111,6 +113,7 @@ document.addEventListener("DOMContentLoaded", function () {
     },
     onCreate({ editor }) {
       console.log("Editor content (onCreate):", editor.getJSON());
+      console.log("Editor schema:", editor.schema);
     },
   });
 

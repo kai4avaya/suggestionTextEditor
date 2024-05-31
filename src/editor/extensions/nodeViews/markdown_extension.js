@@ -35,10 +35,23 @@ class MarkdownView {
 
       // Parse the content using the Tiptap editor schema
       const schema = this.node.editor.view.state.schema;
+
+      // NEW
+      const parser2 = ProseMirrorDOMParser.fromSchema(schema);
+      const fragment = parser2.parseSlice(this.contentDOM).content;
+      const markdownNode = schema.nodes.markdown.create({}, fragment);
+      // const tr = this.view.state.tr.replaceWith(this.getPos(), this.getPos() + this.node.nodeSize, markdownNode);
+      console.log("i am  this.node.node.content.size", this.node.node.content.size)
+      
       const parser = ProseMirrorDOMParser.fromSchema(schema);
       const doc = parser.parse(this.contentDOM);
+      const nodeSize =  this.node.node.content.size  //nodeSize ? this.node.nodeSize : this.node.content.size + 2; 
+      // Calculate the end position of the node
+      const nodeEnd = this.node.getPos() + nodeSize;
+      // console.log("this.node.editor", nodeEnd, this.node.nodeSize)
 
-      const tr = this.node.editor.view.state.tr.replaceWith(0, this.node.editor.view.state.doc.content.size, doc);
+      // const tr = this.node.editor.view.state.tr.replaceWith(0, this.node.editor.view.state.doc.content.size, doc);
+      const tr = this.node.editor.view.state.tr.replaceWith(this.node.getPos(), nodeEnd, markdownNode);
       this.node.editor.view.dispatch(tr);
     }
 

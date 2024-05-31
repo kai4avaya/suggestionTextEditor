@@ -9,7 +9,7 @@ export default Node.create({
 
   group: 'block',
 
-  atom: true, // This ensures that the node is treated as a single unit
+  atom: false, // This ensures that the node is treated as a single unit
 
   addAttributes() {
     return {
@@ -126,11 +126,6 @@ export default Node.create({
               try{
                 JSON.parse(annotationNode);
 
-             
-             
-
-              // console.log("annotationNode", annotationNode)
-
               // Update the previously inserted node's attributes
               editor.commands.updateAttributes('annotationCreator', {
                 text: messageText,// annotationNode.content[0].text,
@@ -180,6 +175,16 @@ export default Node.create({
         textarea.value = '';
       });
 
+      // Key handling for backspace and enter keys
+    dom.addEventListener('keydown', (event) => {
+      if (event.key === 'Backspace') {
+        const pos = getPos();
+        editor.chain().focus().deleteRange({ from: pos, to: pos + node.nodeSize }).run();
+      } else if (event.key === 'Enter') {
+        const pos = getPos();
+        editor.chain().focus().setNode('paragraph').setTextSelection(pos + node.nodeSize).run();
+      }
+    });
 
       return {
         dom,
