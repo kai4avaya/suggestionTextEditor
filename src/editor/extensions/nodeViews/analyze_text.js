@@ -9,8 +9,10 @@ export default Node.create({
 
   group: 'block',
 
-  atom: false, // This ensures that the node is treated as a single unit
+  content: 'inline*',
 
+  // atom: false, // This ensures that the node is treated as a single unit
+  // atom: true,
   addAttributes() {
     return {
       // Any attributes you might want to save
@@ -26,7 +28,7 @@ export default Node.create({
   },
 
   renderHTML({ HTMLAttributes }) {
-    return ['form-node', mergeAttributes(HTMLAttributes)];
+    return ['form-node',mergeAttributes(HTMLAttributes), 0]
   },
 
   addNodeView() {

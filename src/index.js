@@ -3,6 +3,8 @@
 import { EditorContent, Editor } from "@tiptap/vue-3";
 
 import NodeView from "./editor/extensions/nodeViews/analyze_text.js";
+import Analyze_text from "./editor/extensions/nodeViews/analyze_text2.js";
+
 import Clicker from "./editor/extensions/nodeViews/counter.js";
 
 import StarterKit from "@tiptap/starter-kit";
@@ -52,6 +54,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       StarterKit,
       NodeView,
+      Analyze_text,
       TextStyle,
       Clicker,
       Sortable_list,
@@ -103,7 +106,10 @@ document.addEventListener("DOMContentLoaded", function () {
     
   <div data-type="markdown" data-content="# Hello World\n\nThis is a markdown example."># Hello World\n\nThis is a markdown example.</div>
   <form-node></form-node>
-  `
+ 
+  <analyzeText>
+  <p>This is editable.</p>
+  </analyzeText>`
     ,
     editorProps: {
       attributes: {
